@@ -11,8 +11,7 @@ import * as stv from '/providers/7TV.js';
 
 let cosmeticsLoaded = false;
 let chatterinoIDs = [];
-let homiesUserBadges;
-let homiesRoleBadges;
+let homiesCustomBadges;
 let chatterinoBadges;
 let chatsenIDs = [];
 let bttvBadges = [];
@@ -21,6 +20,7 @@ let chattyIDs = [];
 let homiesIDs = [];
 let ffzapIDs = [];
 let chatsenBadges;
+let homiesBadges;
 let stvCosmetics;
 let dankIDs = [];
 let twitchBadges;
@@ -34,11 +34,11 @@ let bttvData;
 async function fetchData() {
     const startFunction = performance.now();
 
+    homiesCustomBadges = await getCachedOrFetch('homiesCustomBadges', () => homies.getCustomBadges(), 24);
     chatterinoBadges = await getCachedOrFetch('chatterinoBadges', () => chatterino.getBadges(), 24);
-    homiesRoleBadges = await getCachedOrFetch('homiesRoleBadges', () => homies.getRoleBadges(), 24);
-    homiesUserBadges = await getCachedOrFetch('homiesUserBadges', () => homies.getBadges(), 24);
     const dankData = await getCachedOrFetch('dankchatBadges', () => dankchat.getBadges(), 24);
     chatsenBadges = await getCachedOrFetch('chatsenBadges', () => chatsen.getBadges(), 24);
+    homiesBadges = await getCachedOrFetch('homiesBadges', () => homies.getBadges(), 24);
     chattyBadges = await getCachedOrFetch('chattyBadges', () => chatty.getBadges(), 24);
     stvCosmetics = await getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24);
     twitchBadges = await getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24);
@@ -46,17 +46,17 @@ async function fetchData() {
     bttvData = await getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24);
     ffzBadges = await getCachedOrFetch('ffzBadges', () => ffz.getBadges(), 24);
 
+    //Homies
+    const homiesCustom = homiesCustomBadges.map((b) => Number(b.userId));
+    const homiesRole = homiesBadges
+        .map((object) => object.users.map((id) => parseInt(id)))
+        .reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
+    homiesIDs = [...homiesCustom, ...homiesRole];
+
     //Chatterino
     chatterinoIDs = chatterinoBadges
         .map((object) => object.users.map((id) => parseInt(id)))
         .reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
-
-    //Homies
-    const homiesUser = homiesUserBadges.map((b) => Number(b.userId));
-    const homiesRole = homiesRoleBadges
-        .map((object) => object.users.map((id) => parseInt(id)))
-        .reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
-    homiesIDs = [...homiesUser, ...homiesRole];
 
     //DankChat
     const uniqueDankBadges = {};
@@ -504,7 +504,7 @@ async function fetchUserData(userName) {
             homiesIDs.includes(userID),
         );
 
-        const homiesBadge = homiesUserBadges.find((b) => b.userId == userID);
+        const homiesBadge = homiesCustomBadges.find((b) => b.userId == userID);
         if (homiesBadge) {
             const badgeName = `Homies ${displayName} badge`;
 
@@ -520,7 +520,7 @@ async function fetchUserData(userName) {
             applyBadge(homiesBadge.image3, badgeName, 'user');
         }
 
-        for (const badge of homiesRoleBadges) {
+        for (const badge of homiesBadges) {
             const userHasBadge = badge.users.includes(userID.toString());
             createBadgeElement(
                 `<img src='${badge.image3}' alt='Homies Badge'>`,

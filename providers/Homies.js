@@ -1,18 +1,20 @@
-export async function getBadges() {
+export async function getCustomBadges() {
     const getBadges = await fetch(`${window.cors}https://chatterinohomies.com/api/badges/list`);
     return (await getBadges.json()).badges;
 }
 
-export async function getRoleBadges() {
+export async function getBadges() {
     try {
         const badges = await fetch(`${window.cors}https://itzalex.github.io/badges`);
         const badges2 = await fetch(`${window.cors}https://itzalex.github.io/badges2`);
 
-        if (badges.ok || !badges2.ok) {
+        if (badges.ok && !badges2.ok) {
             return (await badges.json()).badges;
+        } else if (badges2.ok && !badges.ok) {
+            return (await badges2.json()).badges;
+        } else {
+            return mergeData(await badges.json(), await badges2.json());
         }
-
-        return mergeData(await badges.json(), await badges2.json());
     } catch (error) {
         return [];
     }
