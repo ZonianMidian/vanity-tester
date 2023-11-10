@@ -477,21 +477,19 @@ async function fetchUserData(userName) {
             chatsenIDs.includes(userID),
         );
 
-        let chatsenBadge = false;
         const chatsenUser = chatsenBadges.users.find((u) => u.id == String(userID));
         for (const badge of chatsenBadges.badges) {
             const userHasBadge = chatsenUser?.badges.filter((b) => b.badgeName == badge.name).length > 0;
             createBadgeElement(
                 `<img src='${badge.image}' alt='Chatsen Badge'>`,
                 badge.title,
-                () => applyBadge(badge.image, badge.title, 'chatsen'),
+                () => applyBadge(badge.image, badge.title, 'chatsen', null, badge.name),
                 'chatsen',
                 userHasBadge,
             );
 
-            if (userHasBadge && !chatsenBadge) {
-                applyBadge(badge.image, badge.title, 'chatsen');
-                chatsenBadge = true;
+            if (userHasBadge) {
+                applyBadge(badge.image, badge.title, 'chatsen', null, badge.name);
             }
         }
 
@@ -772,35 +770,60 @@ function applyBadge(badgeLink, badgeName, platform, color, type) {
     const displayValue = checkbox.checked;
 
     let divName;
-    if (platform == 'twitch') {
-        if (type == 'broadcaster') {
-            divName = 'role';
-        } else if (type == 'moderator') {
-            divName = 'role';
-            if (displayValue) {
-                badgeLink = ffzCustomBadges.mod ?? badgeLink;
-                color = '#00AD03';
+    switch (platform) {
+        case 'twitch':
+            switch (type) {
+                case 'broadcaster':
+                    divName = 'role';
+                    break;
+                case 'moderator':
+                    divName = 'role';
+                    if (displayValue) {
+                        badgeLink = ffzCustomBadges.mod ?? badgeLink;
+                        color = '#00AD03';
+                    }
+                    break;
+                case 'vip':
+                    divName = 'role';
+                    if (displayValue) {
+                        badgeLink = ffzCustomBadges.vip ?? badgeLink;
+                    }
+                    break;
+                case 'subscriber':
+                    divName = 'sub';
+                    break;
+                case 'staff':
+                    divName = 'staff';
+                    break;
+                default:
+                    divName = 'twitch-base';
+                    break;
             }
-        } else if (type == 'vip') {
-            divName = 'role';
-            if (displayValue) {
-                badgeLink = ffzCustomBadges.vip ?? badgeLink;
+            break;
+        case 'ffz':
+            switch (type) {
+                case 'bot':
+                    divName = 'bot';
+                    break;
+                default:
+                    divName = 'ffz-base';
+                    break;
             }
-        } else if (type == 'subscriber') {
-            divName = 'sub';
-        } else if (type == 'staff') {
-            divName = 'staff';
-        } else {
-            divName = 'twitch-base';
-        }
-    } else if (platform == 'ffz') {
-        if (type == 'bot') {
-            divName = 'bot';
-        } else {
-            divName = 'ffz-base';
-        }
-    } else {
-        divName = platform;
+            break;
+        case 'chatsen':
+            if (type == 'developer') {
+                divName = 'dev';
+            } else if (chatsen.relaxo.includes(type)) {
+                divName = 'relaxo';
+            } else if (chatsen.patreon.includes(type)) {
+                divName = 'patreon';
+            } else {
+                divName = 'chatsen-base';
+            }
+            break;
+        default:
+            divName = platform;
+            break;
     }
     const platformSubdiv = allUserBadges.querySelector(`.badge-${divName}`);
 

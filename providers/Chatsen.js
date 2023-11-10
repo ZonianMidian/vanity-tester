@@ -38,6 +38,17 @@ async function getPatreons() {
     return await getPatreons.json();
 }
 
+export const relaxo = ['early_bird', 'relaxo'];
+export const patreon = [
+    'patreon_tier1s',
+    'patreon_tier1',
+    'patreon_tier2s',
+    'patreon_tier2',
+    'patreon_tier3s',
+    'patreon_tier3',
+    'patreon_tier4',
+];
+
 const tiers = {
     'Chatsen Patreon: Tier 1': 'patreon_tier1',
     'Chatsen Patreon: Tier 2': 'patreon_tier2',
