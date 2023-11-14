@@ -73,6 +73,7 @@ export const filteredBadges = [
     'broadcaster',
     'subscriber',
     'sub-gifter',
+    'hype-train',
     'moderator',
     'founder',
     'moments',
