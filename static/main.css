@@ -373,4 +373,5 @@ label {
     transform: translate(-50%, -50%);
     opacity: 0.5;
     margin: 10rem;
+    z-index: 1000;
 }

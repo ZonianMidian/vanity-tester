@@ -130,10 +130,7 @@ async function fetchUserData(userName) {
     try {
         const startFunction = performance.now();
 
-        if (document.querySelector('.userCosmetics').style.display == 'block' || !cosmeticsLoaded) {
-            document.getElementById('rotating-circle').style.display = 'block';
-        }
-        document.getElementById('user-arrow').style.display = 'none';
+        loadingCircle();
 
         userLoaded = {
             loaded: false,
@@ -976,6 +973,30 @@ function getVisualizerWidth() {
     );
 }
 
+function getParam(param) {
+    const URL = window.location.href;
+
+    const params = URL.split('?')[1];
+
+    if (params) {
+        const pares = params.split('&');
+
+        for (let i = 0; i < pares.length; i++) {
+            const par = pares[i].split('=');
+            if (par[0] === param) {
+                return par[1];
+            }
+        }
+    }
+
+    return null;
+}
+
+function loadingCircle() {
+    document.getElementById('rotating-circle').style.display = 'block';
+    document.getElementById('user-arrow').style.display = 'none';
+}
+
 const firstSize = '70px';
 let badgeSize = firstSize;
 
@@ -1064,6 +1085,7 @@ window.handleTextChange = function (newText) {
     timeoutId = setTimeout(() => {
         clearBadges();
         clearPaint();
+        loadingCircle();
         if (cosmeticsLoaded) handleCustomBadges(null, null, true);
 
         const badgesSection = document.getElementById('badgesSection').querySelector('.userCosmetics');
@@ -1395,10 +1417,17 @@ window.onload = function () {
     customChannel.disabled = true;
     customChannel.value = '';
 
+    const userParam = getParam('u');
     let userName;
-    if (getCookie('userName')) {
+    if (userParam) {
+        userName = userParam;
+        clearBadges();
+        loadingCircle();
+        fetchUserData(userName);
+    } else if (getCookie('userName')) {
         userName = getCookie('userName');
         clearBadges();
+        loadingCircle();
         fetchUserData(userName);
     } else {
         userName = 'ZonianMidian';
