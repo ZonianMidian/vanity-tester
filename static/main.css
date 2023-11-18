@@ -78,6 +78,11 @@ body {
     -webkit-text-fill-color: transparent;
 }
 
+.text-effect::placeholder {
+    -webkit-text-fill-color: white;
+    opacity: 0.7;
+}
+
 #editText:focus {
     outline: none;
 }

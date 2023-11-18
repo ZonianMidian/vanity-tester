@@ -149,7 +149,11 @@ async function fetchUserData(userName) {
             () => twitch.getUserData(userName),
             1,
         );
-        if (!userData[0]) return;
+        if (!userData[0]) {
+            document.getElementById('rotating-circle').style.display = 'none';
+            handleDisplayTextChange(userName);
+            return;
+        }
 
         const userID = Number(userData[0].id);
         let userBadge = userData[0].badges[0] ?? [];
@@ -567,6 +571,7 @@ async function fetchUserData(userName) {
         const endFunction = performance.now();
         console.log(`User "${displayName}" loaded in ${endFunction - startFunction}ms`);
     } catch (error) {
+        document.getElementById('rotating-circle').style.display = 'none';
         console.error('User Error:', error);
     }
 }
@@ -1074,8 +1079,10 @@ window.getCookie = function (name) {
 };
 
 let timeoutId;
-window.handleTextChange = function (newText) {
-    newText = newText.trim();
+window.handleTextChange = function (element) {
+    const newText = handleDisplayTextChange(element.value);
+    if (!newText.length) return;
+
     if (timeoutId) {
         clearTimeout(timeoutId);
     }
@@ -1097,10 +1104,9 @@ window.handleTextChange = function (newText) {
 
         const paintsSection = document.getElementById('paintsSection').querySelector('.userCosmetics');
         paintsSection.innerHTML = '';
-        const userName = newText || 'ZonianMidian';
 
         maxWidthVisualizer();
-        fetchUserData(userName);
+        fetchUserData(newText);
         maxWidthVisualizer();
     }, 2000);
 };
@@ -1118,7 +1124,7 @@ window.toggleFFZBadges = function () {
 
 window.adjustInputWidth = function () {
     const input = document.getElementById('editText');
-    const text = input.value;
+    const text = input.value || input.placeholder;
     const font = window.getComputedStyle(input, null).getPropertyValue('font');
     const canvas = document.createElement('canvas');
     const context = canvas.getContext('2d');
@@ -1221,12 +1227,14 @@ window.createPaintElement = function (paintName, backgroundColor, onClickHandler
 };
 
 window.handleDisplayTextChange = function (value) {
-    value = value?.trim() || 'ZonianMidian';
+    value = value?.trim().replace(/[^a-zA-Z0-9_]/g, '');
+
     document.getElementById('editText').value = value;
     document.getElementById('displayName').value = value;
 
     adjustInputWidth();
     maxWidthVisualizer();
+    return value;
 };
 
 window.handleColorChange = function (value) {
@@ -1417,23 +1425,20 @@ window.onload = function () {
     customChannel.disabled = true;
     customChannel.value = '';
 
-    const userParam = getParam('u');
     let userName;
+    const userParam = getParam('u');
+    const userCookie = getCookie('userName');
     if (userParam) {
         userName = userParam;
-        clearBadges();
-        loadingCircle();
-        fetchUserData(userName);
-    } else if (getCookie('userName')) {
-        userName = getCookie('userName');
-        clearBadges();
-        loadingCircle();
-        fetchUserData(userName);
+    } else if (userCookie) {
+        userName = userCookie;
     } else {
-        userName = 'ZonianMidian';
+        return;
     }
 
-    document.getElementById('displayName').value = userName;
+    clearBadges();
+    loadingCircle();
+    fetchUserData(userName);
     handleDisplayTextChange(userName);
 };
 
