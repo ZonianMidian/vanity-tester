@@ -1503,6 +1503,40 @@ document.querySelectorAll('.userBadge').forEach((badge) => {
     });
 });
 
+const konamiCode = [
+    'ArrowUp',
+    'ArrowUp',
+    'ArrowDown',
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowLeft',
+    'ArrowRight',
+    'KeyB',
+    'KeyA',
+];
+let konamiCodePosition = 0;
+
+document.addEventListener('keydown', function (e) {
+    const key = e.code;
+
+    if (key === konamiCode[konamiCodePosition]) {
+        konamiCodePosition++;
+
+        if (konamiCodePosition === konamiCode.length) {
+            console.log('Konami Code Activated!');
+            const allCosmeticsDiv = document.querySelector('#paintsSection .allCosmetics');
+
+            if (allCosmeticsDiv) {
+                allCosmeticsDiv.classList.remove('invisibleElement');
+            }
+            konamiCodePosition = 0;
+        }
+    } else {
+        konamiCodePosition = 0;
+    }
+});
+
 document.addEventListener('keydown', function (event) {
     if (event.key === 'Escape' || event.key === 'Esc') {
         filterItems('');
