@@ -989,7 +989,7 @@ function getParam(param) {
         for (let i = 0; i < pares.length; i++) {
             const par = pares[i].split('=');
             if (par[0] === param) {
-                return par[1];
+                return decodeURI(par[1]);
             }
         }
     }
@@ -1436,10 +1436,13 @@ window.onload = function () {
         return;
     }
 
-    clearBadges();
-    loadingCircle();
-    fetchUserData(userName);
-    handleDisplayTextChange(userName);
+    userName = handleDisplayTextChange(userName);
+    if (userName.length) {
+        clearBadges();
+        loadingCircle();
+        fetchUserData(userName);
+        handleDisplayTextChange(userName);
+    }
 };
 
 window.cors = 'https://corsproxy.io/?';
