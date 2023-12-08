@@ -1,6 +1,7 @@
 import * as chatterino from '/providers/Chatterino.js';
 import * as ffzap from '/providers/FrankerFaceZAP.js';
 import * as dankchat from '/providers/DankChat.js';
+import * as purpletv from '/providers/PurpleTV.js';
 import * as ffz from '/providers/FrankerFaceZ.js';
 import * as chatsen from '/providers/Chatsen.js';
 import * as bttv from '/providers/BetterTTV.js';
@@ -13,11 +14,13 @@ let cosmeticsLoaded = false;
 let chatterinoIDs = [];
 let homiesCustomBadges;
 let chatterinoBadges;
+let purpletvIDs = [];
 let chatsenIDs = [];
 let bttvBadges = [];
 let loaded = false;
 let chattyIDs = [];
 let homiesIDs = [];
+let purpletvBadges;
 let ffzapIDs = [];
 let chatsenBadges;
 let homiesBadges;
@@ -38,6 +41,7 @@ async function fetchData() {
     chatterinoBadges = await getCachedOrFetch('chatterinoBadges', () => chatterino.getBadges(), 24);
     const dankData = await getCachedOrFetch('dankchatBadges', () => dankchat.getBadges(), 24);
     chatsenBadges = await getCachedOrFetch('chatsenBadges', () => chatsen.getBadges(), 24);
+    purpletvBadges = await getCachedOrFetch('purpleBadges', () => purpletv.getBadges(), 24);
     homiesBadges = await getCachedOrFetch('homiesBadges', () => homies.getBadges(), 24);
     chattyBadges = await getCachedOrFetch('chattyBadges', () => chatty.getBadges(), 24);
     stvCosmetics = await getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24);
@@ -81,6 +85,9 @@ async function fetchData() {
 
     //Chatsen
     chatsenIDs = chatsenBadges.users.map((u) => parseInt(u.id));
+
+    //PurpleTV
+    purpletvIDs = purpletvBadges.users.map((b) => parseInt(b.userId));
 
     //Chatty
     chattyIDs = chattyBadges.map((b) => b.usernames).reduce((acc, userids) => acc.concat(userids), []);
@@ -531,6 +538,45 @@ async function fetchUserData(userName) {
 
             if (userHasBadge) {
                 applyBadge(badge.image3, badge.tooltip, 'homies-base');
+            }
+        }
+
+        //PurpleTV
+        createBadgeElement(
+            '<i class="fa-solid fa-eye-slash"></i>',
+            'No PurpleTV Badge',
+            () => clearBadges('purpletv'),
+            'purpletv',
+            purpletvIDs.includes(userID),
+        );
+
+        let purpleUniqueBadges = [];
+
+        for (const user of purpletvBadges.users) {
+            const customBadge = user.badgeUrl.length > 0;
+            const devBadge = user.userId == '157861306';
+            const userHasBadge = user.userId == String(userID);
+            const userBadge =
+                user.badgeUrl.length > 0
+                    ? user.badgeUrl.replace('nopbreak.ru', 'nopbreak.ws')
+                    : purpletvBadges.defaultBadgeUrl;
+            const badgeTile = devBadge
+                ? 'PurpleTV Developer'
+                : customBadge
+                  ? 'PurpleTV Custom Badge'
+                  : 'PurpleTV Donor Badge';
+            createBadgeElement(
+                `<img src='${userBadge}' alt='PurpleTV Badge'>`,
+                badgeTile,
+                () => applyBadge(userBadge, badgeTile, 'purpletv'),
+                'purpletv',
+                userHasBadge,
+                purpleUniqueBadges.includes(userBadge),
+            );
+            purpleUniqueBadges.push(userBadge);
+
+            if (userHasBadge) {
+                applyBadge(userBadge, badgeTile, 'purpletv');
             }
         }
 
