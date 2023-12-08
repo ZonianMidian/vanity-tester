@@ -998,23 +998,37 @@ async function getImageHash(imageURL) {
 }
 
 async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours) {
-    let cachedData = localStorage.getItem(key);
-
-    if (cachedData) {
-        const cachedTime = localStorage.getItem(`${key}_timestamp`);
-        if (cachedTime && Date.now() - parseInt(cachedTime) < expirationTimeInHours * 60 * 60 * 1000) {
-            cachedData = JSON.parse(cachedData);
-            if (cachedData != null) return cachedData;
-        }
-    }
+    const start = performance.now();
 
     try {
-        const fetchedData = await fetchFunction();
-        localStorage.setItem(key, JSON.stringify(fetchedData));
-        localStorage.setItem(`${key}_timestamp`, Date.now().toString());
-        return fetchedData;
+        let cachedData = localStorage.getItem(key);
+
+        if (cachedData) {
+            const cachedTime = localStorage.getItem(`${key}_timestamp`);
+            if (cachedTime && Date.now() - parseInt(cachedTime) < expirationTimeInHours * 60 * 60 * 1000) {
+                cachedData = JSON.parse(cachedData);
+                console.log(`Key "${key}" fetched from cache in ${performance.now() - start}ms`);
+                if (cachedData) return cachedData;
+            }
+        } else {
+            const timeoutPromise = new Promise((reject) => {
+                setTimeout(() => {
+                    reject(new Error('Execution exceeded the 10-second limit'));
+                }, 10000);
+            });
+
+            const fetchedDataPromise = fetchFunction();
+
+            const promisedData = await Promise.race([fetchedDataPromise, timeoutPromise]);
+
+            localStorage.setItem(key, JSON.stringify(promisedData));
+            localStorage.setItem(`${key}_timestamp`, Date.now().toString());
+            console.log(`Key "${key}" fetched in ${performance.now() - start}ms`);
+            return promisedData;
+        }
     } catch (e) {
-        return [];
+        console.error(`Key "${key}" fetch failed in ${performance.now() - start}ms - ${e}`);
+        return null;
     }
 }
 
