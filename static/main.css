@@ -382,28 +382,30 @@ label {
     }
 
     .badge {
-      width: 3.5rem;
-      height: 3.5rem;
+        width: 3.5rem;
+        height: 3.5rem;
     }
-  
+
     .badge img {
-      max-width: 30px;
-      max-height: 30px;
+        max-width: 30px;
+        max-height: 30px;
     }
-  
-    .badge, .paint {
-      font-size: 0.9rem;
+
+    .badge,
+    .paint {
+        font-size: 0.9rem;
     }
 
     .badges {
         gap: 5px;
     }
-  
+
     .paint {
-      padding: 0;
+        padding: 0;
     }
 
-    #search-button, .gear-button {
+    #search-button,
+    .gear-button {
         font-size: 1rem !important;
         bottom: 0px;
     }

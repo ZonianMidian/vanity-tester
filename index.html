@@ -4,13 +4,12 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css" />
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
-        <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
         <meta property="og:description" content="Try colors, paints and badges on your Twitch user" />
         <meta name="description" content="Try colors, paints and badges on your Twitch user" />
         <link href="./static/main.css" rel="stylesheet" type="text/css" />
-        <meta property="og:image" content="/static/favicon.ico" />
+        <meta property="og:image" content="./static/favicon.ico" />
         <meta name="application-name" content="Vanity Tester" />
-        <link rel="shortcut icon" href="/static/favicon.ico" />
+        <link rel="shortcut icon" href="./static/favicon.ico" />
         <meta name="keywords" content="twitch, chat, badges" />
         <meta property="og:title" content="Vanity Tester" />
         <meta property="og:type" content="website" />
@@ -45,7 +44,7 @@
                 <button class="purple-button" id="toggle-mode" onclick="toggleMode()">Free Mode</button>
             </div>
             <div style="margin: 0">
-                <button class="red-button" id="clear-cache" onclick="clearCache()">Clear Cache</button>
+                <button class="red-button" id="clear-cache" onclick="clearStorage()">Clear Cache</button>
             </div>
             <div class="menu-section">
                 <p>Display:</p>
@@ -259,6 +258,7 @@
                 <div class="allCosmetics invisibleElement" style="display: none"></div>
             </div>
         </div>
+        <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
     </body>
     <script src="./static/index.js" type="module"></script>
     <script type="text/javascript">

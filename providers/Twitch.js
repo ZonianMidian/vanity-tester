@@ -1,6 +1,6 @@
 export async function getUserData(userName) {
     try {
-        const userData = await fetch(`${window.cors}https://api.ivr.fi/v2/twitch/user?login=${userName}`);
+        const userData = await fetch(`https://api.ivr.fi/v2/twitch/user?login=${userName}`);
 
         if (!userData.ok) {
             throw new Error();
@@ -14,7 +14,7 @@ export async function getUserData(userName) {
 
 export async function getChannelData(userName) {
     try {
-        const channelData = await fetch(`${window.cors}https://api.ivr.fi/v2/twitch/badges/channel?login=${userName}`);
+        const channelData = await fetch(`https://api.ivr.fi/v2/twitch/badges/channel?login=${userName}`);
 
         if (!channelData.ok) {
             throw new Error();
@@ -27,7 +27,7 @@ export async function getChannelData(userName) {
 }
 
 export async function getBadges() {
-    const getBadges = await fetch(`${window.cors}https://api.ivr.fi/v2/twitch/badges/global`);
+    const getBadges = await fetch(`https://api.ivr.fi/v2/twitch/badges/global`);
     return await getBadges.json();
 }
 

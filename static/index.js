@@ -136,7 +136,6 @@ async function fetchUserData(userName) {
 
     try {
         const startFunction = performance.now();
-
         loadingCircle();
 
         userLoaded = {
@@ -156,9 +155,10 @@ async function fetchUserData(userName) {
             () => twitch.getUserData(userName),
             1,
         );
-        if (!userData[0]) {
+        if (!userData?.length) {
             document.getElementById('rotating-circle').style.display = 'none';
             handleDisplayTextChange(userName);
+            changeLink();
             return;
         }
 
@@ -512,7 +512,7 @@ async function fetchUserData(userName) {
 
         const homiesBadge = homiesCustomBadges.find((b) => b.userId == userID);
         if (homiesBadge) {
-            const badgeName = `Homies ${displayName} badge`;
+            const badgeName = `Homies ${displayName} Badge`;
 
             createBadgeElement(
                 `<img src='${homiesBadge.image3}' alt='Homies Badge'>`,
@@ -586,6 +586,7 @@ async function fetchUserData(userName) {
         userLoaded.displayName = displayName;
         userLoaded.userID = userID;
         userLoaded.loaded = true;
+        changeLink();
 
         if (!cosmeticsLoaded) {
             const sections = document.getElementById('sections');
@@ -607,14 +608,13 @@ async function fetchUserData(userName) {
             checkbox.disabled = false;
         });
 
-        document.getElementById('customChannel').value = '';
         document.getElementById('customChannel').disabled = false;
         document.getElementById('buttonMenu').style.display = 'flex';
         document.getElementById('optionsMessage').style.display = 'none';
         document.getElementById('search-button').style.display = 'block';
         document.getElementById('rotating-circle').style.display = 'none';
 
-        setTimeout(() => maxWidthVisualizer(), 100);
+        setTimeout(() => maxWidthVisualizer(), 1000);
 
         const endFunction = performance.now();
         console.log(`User "${displayName}" loaded in ${endFunction - startFunction}ms`);
@@ -633,6 +633,7 @@ let ffzCustomBadges = {
 async function fetchChannelData(userName) {
     try {
         const startFunction = performance.now();
+        loadingCircle();
 
         const channelData = await getCachedOrFetch(
             `twitchUser:${userName.toLocaleLowerCase()}`,
@@ -746,7 +747,10 @@ async function fetchChannelData(userName) {
             }
         }
 
+        //Display
+        document.getElementById('rotating-circle').style.display = 'none';
         document.getElementById('customChannel').disabled = false;
+        changeLink(channelName);
 
         const endFunction = performance.now();
         console.log(
@@ -1031,7 +1035,7 @@ async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours) {
         }
     } catch (e) {
         console.error(`Key "${key}" fetch failed in ${performance.now() - start}ms - ${e}`);
-        return null;
+        return [];
     }
 }
 
@@ -1039,6 +1043,10 @@ function getVisualizerWidth() {
     return Number(
         document.getElementById('allUserBadges').offsetWidth + document.getElementById('editText').offsetWidth,
     );
+}
+
+function elementSize() {
+    return document.getElementById('editText').offsetHeight > document.getElementById('allUserBadges').offsetHeight;
 }
 
 function getParam(param) {
@@ -1078,8 +1086,10 @@ window.maxWidthVisualizer = function () {
 
     if (visualizerWidth > pageWidth) {
         while (visualizerWidth > pageWidth && parseFloat(editText.style.fontSize) > 0) {
-            const currentFontSize = parseFloat(editText.style.fontSize);
-            editText.style.fontSize = `${(currentFontSize - 0.1).toFixed(1)}px`;
+            while (elementSize() && parseFloat(editText.style.fontSize) > 0) {
+                const currentFontSize = parseFloat(editText.style.fontSize);
+                editText.style.fontSize = `${(currentFontSize - 0.1).toFixed(1)}px`;
+            }
 
             for (let i = 0; i < badgeImages.length; i++) {
                 const currentHeight = parseFloat(badgeImages[i].style.height);
@@ -1105,7 +1115,7 @@ window.maxWidthVisualizer = function () {
     }
 };
 
-window.clearCache = function () {
+window.clearStorage = function () {
     for (const key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
             localStorage.removeItem(key);
@@ -1156,6 +1166,8 @@ window.handleTextChange = function (element) {
     timeoutId = setTimeout(() => {
         clearBadges();
         clearPaint();
+
+        clearFilter();
         loadingCircle();
         if (cosmeticsLoaded) handleCustomBadges(null, null, true);
 
@@ -1169,8 +1181,14 @@ window.handleTextChange = function (element) {
         const paintsSection = document.getElementById('paintsSection').querySelector('.userCosmetics');
         paintsSection.innerHTML = '';
 
+        const channelName = getParam('c');
+
         maxWidthVisualizer();
-        fetchUserData(newText);
+        fetchUserData(newText).then(function () {
+            if (channelName) {
+                fetchChannelData(channelName);
+            }
+        });
     }, 2000);
 };
 
@@ -1194,9 +1212,7 @@ window.adjustInputWidth = function () {
     context.font = font;
     const textWidth = context.measureText(text).width;
     input.style.width = textWidth + 'px';
-
-    const displayName = document.getElementById('displayName');
-    displayName.value = text;
+    return textWidth;
 };
 
 window.toggleSection = function (sectionId) {
@@ -1299,6 +1315,23 @@ window.handleDisplayTextChange = function (value) {
     return value;
 };
 
+window.changeLink = function (channel) {
+    const user = getCookie('userName');
+    let newLink;
+
+    if (!user) {
+        return;
+    } else {
+        newLink = '?u=' + encodeURIComponent(user);
+    }
+
+    if (channel) {
+        newLink += '&c=' + encodeURIComponent(channel);
+    }
+
+    window.history.pushState({}, '', newLink);
+};
+
 window.handleColorChange = function (value) {
     value = value?.toUpperCase() || '#FFFFFF';
     document.documentElement.style.setProperty('--user-color', value);
@@ -1314,6 +1347,7 @@ window.handleChannelChange = function (value) {
     channelTimer = setTimeout(() => {
         document.getElementById('customChannel').disabled = true;
 
+        clearFilter();
         clearBadges('twitch');
         if (cosmeticsLoaded) handleCustomBadges(null, null, true);
         if (userLoaded.tBadge[0])
@@ -1344,8 +1378,9 @@ window.handleChannelChange = function (value) {
         };
 
         if (!userLoaded.loaded || !value.length) {
-            document.getElementById('customChannel').disabled = false;
             document.querySelector('.platform-twitch-channel').style.display = 'none';
+            document.getElementById('customChannel').disabled = false;
+            changeLink();
             return;
         }
         fetchChannelData(value);
@@ -1464,12 +1499,27 @@ window.filterItems = function (value) {
     }
 };
 
+window.clearFilter = function () {
+    filterItems('');
+
+    const searchButton = document.getElementById('search-button');
+    const searchField = document.getElementById('search-field');
+    searchField.value = '';
+
+    if (searchField.style.display == 'block') {
+        searchButton.style.display = 'block';
+        searchField.style.display = 'none';
+    } else {
+        toggleSection('menu');
+    }
+};
+
 window.badges = {
     mod: '',
     vip: '',
 };
 
-window.onload = function () {
+window.onload = async function () {
     fetchData();
     maxWidthVisualizer();
 
@@ -1489,21 +1539,27 @@ window.onload = function () {
 
     let userName;
     const userParam = getParam('u');
+    const channelName = getParam('c');
     const userCookie = getCookie('userName');
     if (userParam) {
         userName = userParam;
     } else if (userCookie) {
         userName = userCookie;
-    } else {
-        return;
     }
 
     userName = handleDisplayTextChange(userName);
     if (userName.length) {
         clearBadges();
         loadingCircle();
-        fetchUserData(userName);
+        await fetchUserData(userName);
         handleDisplayTextChange(userName);
+    }
+
+    setTimeout(() => maxWidthVisualizer(), 1000);
+
+    if (userParam && channelName?.length) {
+        loadingCircle();
+        await fetchChannelData(channelName);
     }
 };
 
@@ -1603,18 +1659,5 @@ document.addEventListener('keydown', function (e) {
 });
 
 document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' || event.key === 'Esc') {
-        filterItems('');
-
-        const searchButton = document.getElementById('search-button');
-        const searchField = document.getElementById('search-field');
-        searchField.value = '';
-
-        if (searchField.style.display == 'block') {
-            searchButton.style.display = 'block';
-            searchField.style.display = 'none';
-        } else {
-            toggleSection('menu');
-        }
-    }
+    if (event.key === 'Escape' || event.key === 'Esc') clearFilter();
 });
