@@ -257,8 +257,8 @@ button {
     color: #fff;
     padding: 20px;
     z-index: 1000;
-    display: flex;
     flex-direction: column;
+    border-radius: 5px;
 }
 
 .hidden {
@@ -313,6 +313,7 @@ label {
     z-index: 100;
     outline: none;
     border: none;
+    display: none;
 }
 
 .gear-button {
@@ -366,17 +367,84 @@ label {
     position: static;
 }
 
-#search-field {
-    display: none;
-}
-
 #rotating-circle {
     font-size: 15rem !important;
     position: fixed;
-    top: 10%;
-    left: 32%;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0.5;
-    margin: 10rem;
-    z-index: 1000;
+}
+
+@media (max-width: 1023px) {
+    #allUserBadges div {
+        margin-right: 5px;
+    }
+
+    .badge {
+      width: 3.5rem;
+      height: 3.5rem;
+    }
+  
+    .badge img {
+      max-width: 30px;
+      max-height: 30px;
+    }
+  
+    .badge, .paint {
+      font-size: 0.9rem;
+    }
+
+    .badges {
+        gap: 5px;
+    }
+  
+    .paint {
+      padding: 0;
+    }
+
+    #search-button, .gear-button {
+        font-size: 1rem !important;
+        bottom: 0px;
+    }
+
+    #search-button {
+        left: 0;
+    }
+
+    .gear-button {
+        right: 0;
+    }
+
+    #menu {
+        font-size: 20px !important;
+        width: 300px;
+        height: auto;
+        padding: 10px;
+        top: 0;
+        right: 0;
+    }
+
+    #search-field {
+        font-size: 1rem !important;
+        margin: 0;
+        height: 28.4px;
+        bottom: 5px;
+        left: 5px;
+    }
+
+    #visualizer {
+        height: 4rem;
+    }
+
+    #allUserBadges div img {
+        width: auto;
+        max-height: 40px;
+    }
+}
+
+@media (max-height: 719px) {
+    #menu {
+        font-size: 21.5px !important;
+    }
 }

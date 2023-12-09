@@ -3,10 +3,10 @@
     <head>
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
         <script src="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.js"></script>
         <meta property="og:description" content="Try colors, paints and badges on your Twitch user" />
         <meta name="description" content="Try colors, paints and badges on your Twitch user" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <link href="./static/main.css" rel="stylesheet" type="text/css" />
         <meta property="og:image" content="/static/favicon.ico" />
         <meta name="application-name" content="Vanity Tester" />
@@ -216,11 +216,13 @@
                     data-paint-id="userName" />
             </div>
         </div>
-        <div id="user-arrow" style="opacity: 0.5; margin: 5rem">
+        <div id="user-arrow" style="opacity: 0.5; margin-top: 5rem">
             <i id="arrow-up" class="fa-solid fa-up-long fa-fade" style="font-size: 5rem"></i>
-            <p style="font-size: 3rem; margin: 0">Type a username</p>
+            <p style="font-size: 3rem; margin: auto">Type a username</p>
         </div>
-        <i id="rotating-circle" class="fa-solid fa-spinner fa-spin-pulse" style="display: none"></i>
+        <div id="rotating-circle" style="display: none">
+            <i class="fa-solid fa-spinner fa-spin-pulse"></i>
+        </div>
         <div id="sections" style="display: none">
             <div id="badgesSection">
                 <div class="userCosmetics" style="flex-direction: column">

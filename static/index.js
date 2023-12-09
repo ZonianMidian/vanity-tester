@@ -170,7 +170,7 @@ async function fetchUserData(userName) {
         handleColorChange(userData[0].chatColor);
         handleDisplayTextChange(displayName);
         setCookie('userName', displayName);
-        adjustInputWidth();
+        maxWidthVisualizer();
 
         //Twitch
         let { displayBadges, earnedBadges } = await getCachedOrFetch(
@@ -614,11 +614,14 @@ async function fetchUserData(userName) {
         document.getElementById('search-button').style.display = 'block';
         document.getElementById('rotating-circle').style.display = 'none';
 
+        setTimeout(() => maxWidthVisualizer(), 100);
+
         const endFunction = performance.now();
         console.log(`User "${displayName}" loaded in ${endFunction - startFunction}ms`);
     } catch (error) {
         document.getElementById('rotating-circle').style.display = 'none';
         console.error('User Error:', error);
+        maxWidthVisualizer();
     }
 }
 
@@ -1066,8 +1069,9 @@ const firstSize = '70px';
 let badgeSize = firstSize;
 
 window.maxWidthVisualizer = function () {
+    adjustInputWidth();
     let visualizerWidth = getVisualizerWidth();
-    let pageWidth = window.innerWidth - 50;
+    let pageWidth = window.innerWidth < 1024 ? window.innerWidth - 20 : window.innerWidth - 50;
 
     let badgeImages = document.querySelectorAll('#allUserBadges div img');
     let editText = document.getElementById('editText');
@@ -1167,7 +1171,6 @@ window.handleTextChange = function (element) {
 
         maxWidthVisualizer();
         fetchUserData(newText);
-        maxWidthVisualizer();
     }, 2000);
 };
 
@@ -1292,7 +1295,6 @@ window.handleDisplayTextChange = function (value) {
     document.getElementById('editText').value = value;
     document.getElementById('displayName').value = value;
 
-    adjustInputWidth();
     maxWidthVisualizer();
     return value;
 };
@@ -1469,7 +1471,7 @@ window.badges = {
 
 window.onload = function () {
     fetchData();
-    adjustInputWidth();
+    maxWidthVisualizer();
 
     const input = document.getElementById('editText');
     input.style.display = '';
