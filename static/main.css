@@ -374,6 +374,7 @@ label {
     left: 50%;
     transform: translate(-50%, -50%);
     opacity: 0.5;
+    z-index: -1;
 }
 
 @media (max-width: 1023px) {

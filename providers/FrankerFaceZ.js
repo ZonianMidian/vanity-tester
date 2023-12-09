@@ -20,6 +20,16 @@ export async function getChannel(channelID) {
     }
 }
 
+export const fallback = {
+    badges: [],
+    users: {},
+};
+
+export const customFallback = {
+    moderatorBadge: null,
+    vipBadge: null,
+};
+
 function getLastValue(obj) {
     return obj[Object.keys(obj)[Object.keys(obj).length - 1]];
 }

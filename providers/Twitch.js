@@ -80,3 +80,8 @@ export const filteredBadges = [
     'bits',
     'vip',
 ];
+
+export const fallback = {
+    displayBadges: [],
+    earnedBadges: [],
+};

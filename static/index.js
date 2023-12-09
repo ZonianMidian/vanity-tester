@@ -37,18 +37,24 @@ let bttvData;
 async function fetchData() {
     const startFunction = performance.now();
 
+    purpletvBadges = await getCachedOrFetch('purpletvBadges', () => purpletv.getBadges(), 24, purpletv.fallback);
+    chatsenBadges = await getCachedOrFetch('chatsenBadges', () => chatsen.getBadges(), 24, chatsen.fallback);
     homiesCustomBadges = await getCachedOrFetch('homiesCustomBadges', () => homies.getCustomBadges(), 24);
     chatterinoBadges = await getCachedOrFetch('chatterinoBadges', () => chatterino.getBadges(), 24);
     const dankData = await getCachedOrFetch('dankchatBadges', () => dankchat.getBadges(), 24);
-    chatsenBadges = await getCachedOrFetch('chatsenBadges', () => chatsen.getBadges(), 24);
-    purpletvBadges = await getCachedOrFetch('purpleBadges', () => purpletv.getBadges(), 24);
+    ffzBadges = await getCachedOrFetch('ffzBadges', () => ffz.getBadges(), 24, ffz.fallback);
     homiesBadges = await getCachedOrFetch('homiesBadges', () => homies.getBadges(), 24);
     chattyBadges = await getCachedOrFetch('chattyBadges', () => chatty.getBadges(), 24);
     stvCosmetics = await getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24);
     twitchBadges = await getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24);
     ffzapBadges = await getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24);
     bttvData = await getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24);
-    ffzBadges = await getCachedOrFetch('ffzBadges', () => ffz.getBadges(), 24);
+
+    //PurpleTV
+    purpletvIDs = purpletvBadges.users.map((b) => parseInt(b.userId));
+
+    //Chatsen
+    chatsenIDs = chatsenBadges.users.map((u) => parseInt(u.id));
 
     //Homies
     const homiesCustom = homiesCustomBadges.map((b) => Number(b.userId));
@@ -83,11 +89,12 @@ async function fetchData() {
         .map((object) => object.users.map((id) => parseInt(id)))
         .reduce((accumulator, currentValue) => accumulator.concat(currentValue), []);
 
-    //Chatsen
-    chatsenIDs = chatsenBadges.users.map((u) => parseInt(u.id));
-
-    //PurpleTV
-    purpletvIDs = purpletvBadges.users.map((b) => parseInt(b.userId));
+    //FrankerFaceZ
+    for (const key in ffzBadges.users) {
+        if (ffzBadges.users.hasOwnProperty(key)) {
+            ffzIDs.push(...ffzBadges.users[key]);
+        }
+    }
 
     //Chatty
     chattyIDs = chattyBadges.map((b) => b.usernames).reduce((acc, userids) => acc.concat(userids), []);
@@ -107,13 +114,7 @@ async function fetchData() {
 
     bttvBadges = Object.values(uniqueBttvBadges).sort((a, b) => a.type - b.type);
 
-    //FrankerFaceZ
-    for (const key in ffzBadges.users) {
-        if (ffzBadges.users.hasOwnProperty(key)) {
-            ffzIDs.push(...ffzBadges.users[key]);
-        }
-    }
-
+    //Display
     loaded = true;
     const endFunction = performance.now();
     console.log(`Global data loaded in ${endFunction - startFunction}ms`);
@@ -155,7 +156,7 @@ async function fetchUserData(userName) {
             () => twitch.getUserData(userName),
             1,
         );
-        if (!userData?.length) {
+        if (!userData.length) {
             document.getElementById('rotating-circle').style.display = 'none';
             handleDisplayTextChange(userName);
             changeLink();
@@ -177,6 +178,7 @@ async function fetchUserData(userName) {
             `twitchUserBadges:${userID}`,
             () => twitch.getUserBadges(userID, displayName),
             1,
+            twitch.fallback,
         );
         earnedBadges = earnedBadges?.filter((b) => !twitch.filteredBadges.includes(b.setID)) ?? [];
 
@@ -640,7 +642,7 @@ async function fetchChannelData(userName) {
             () => twitch.getUserData(userName),
             1,
         );
-        if (!channelData[0]) return;
+        if (!channelData.length) return;
         const channelID = Number(channelData[0].id);
 
         const channelBadges = await getCachedOrFetch(
@@ -679,6 +681,7 @@ async function fetchChannelData(userName) {
             `ffzChannelBadges:${channelID}`,
             () => ffz.getChannel(channelID),
             1,
+            ffz.customFallback,
         );
         await handleCustomBadges(moderatorBadge, vipBadge);
 
@@ -1004,7 +1007,7 @@ async function getImageHash(imageURL) {
     }
 }
 
-async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours) {
+async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours, fallback) {
     const start = performance.now();
 
     try {
@@ -1018,24 +1021,29 @@ async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours) {
                 if (cachedData) return cachedData;
             }
         } else {
-            const timeoutPromise = new Promise((reject) => {
+            const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => {
                     reject(new Error('Execution exceeded the 10-second limit'));
                 }, 10000);
             });
 
             const fetchedDataPromise = fetchFunction();
+            let fetchedData;
 
-            const promisedData = await Promise.race([fetchedDataPromise, timeoutPromise]);
+            try {
+                fetchedData = await Promise.race([fetchedDataPromise, timeoutPromise]);
+            } catch (timeoutError) {
+                throw timeoutError;
+            }
 
-            localStorage.setItem(key, JSON.stringify(promisedData));
+            localStorage.setItem(key, JSON.stringify(fetchedData));
             localStorage.setItem(`${key}_timestamp`, Date.now().toString());
             console.log(`Key "${key}" fetched in ${performance.now() - start}ms`);
-            return promisedData;
+            return fetchedData;
         }
     } catch (e) {
         console.error(`Key "${key}" fetch failed in ${performance.now() - start}ms - ${e}`);
-        return [];
+        return fallback ?? [];
     }
 }
 
@@ -1545,6 +1553,8 @@ window.onload = async function () {
         userName = userParam;
     } else if (userCookie) {
         userName = userCookie;
+    } else {
+        userName = '';
     }
 
     userName = handleDisplayTextChange(userName);

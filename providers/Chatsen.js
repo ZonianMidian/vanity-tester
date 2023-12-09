@@ -49,6 +49,11 @@ export const patreon = [
     'patreon_tier4',
 ];
 
+export const fallback = {
+    badges: [],
+    users: [],
+}
+
 const tiers = {
     'Chatsen Patreon: Tier 1': 'patreon_tier1',
     'Chatsen Patreon: Tier 2': 'patreon_tier2',
