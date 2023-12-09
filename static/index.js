@@ -610,6 +610,7 @@ async function fetchUserData(userName) {
             checkbox.disabled = false;
         });
 
+        document.getElementById('editText').disabled = false;
         document.getElementById('customChannel').disabled = false;
         document.getElementById('buttonMenu').style.display = 'flex';
         document.getElementById('optionsMessage').style.display = 'none';
@@ -1177,6 +1178,8 @@ window.handleTextChange = function (element) {
     if (newText.toLocaleLowerCase() == userLoaded.displayName.toLocaleLowerCase() || !newText.length) return;
 
     timeoutId = setTimeout(() => {
+        document.getElementById('editText').disabled = true;
+
         clearBadges();
         clearPaint();
 
@@ -1571,6 +1574,8 @@ window.onload = async function () {
 
     userName = handleDisplayTextChange(userName);
     if (userName.length) {
+        document.getElementById('editText').disabled = true;
+        
         clearBadges();
         loadingCircle();
         await fetchUserData(userName);
