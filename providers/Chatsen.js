@@ -52,7 +52,7 @@ export const patreon = [
 export const fallback = {
     badges: [],
     users: [],
-}
+};
 
 const tiers = {
     'Chatsen Patreon: Tier 1': 'patreon_tier1',

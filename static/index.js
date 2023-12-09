@@ -1507,7 +1507,7 @@ window.filterItems = function (value) {
     }
 };
 
-window.clearFilter = function () {
+window.clearFilter = function (menu) {
     filterItems('');
 
     const searchButton = document.getElementById('search-button');
@@ -1517,7 +1517,7 @@ window.clearFilter = function () {
     if (searchField.style.display == 'block') {
         searchButton.style.display = 'block';
         searchField.style.display = 'none';
-    } else {
+    } else if (menu) {
         toggleSection('menu');
     }
 };
@@ -1669,5 +1669,5 @@ document.addEventListener('keydown', function (e) {
 });
 
 document.addEventListener('keydown', function (event) {
-    if (event.key === 'Escape' || event.key === 'Esc') clearFilter();
+    if (event.key === 'Escape' || event.key === 'Esc') clearFilter(true);
 });

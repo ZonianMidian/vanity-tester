@@ -4,6 +4,6 @@ export async function getBadges() {
 }
 
 export const fallback = {
-    defaultBadgeUrl: "https://nopbreak.ws/shared/badge.png",
+    defaultBadgeUrl: 'https://nopbreak.ws/shared/badge.png',
     users: [],
-}
+};
