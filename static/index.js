@@ -117,7 +117,7 @@ async function fetchData() {
     //Display
     loaded = true;
     const endFunction = performance.now();
-    console.log(`Global data loaded in ${endFunction - startFunction}ms`);
+    console.log(`Global data loaded in ${Math.round(endFunction - startFunction)}ms`);
 }
 
 let userLoaded = {
@@ -619,7 +619,7 @@ async function fetchUserData(userName) {
         setTimeout(() => maxWidthVisualizer(), 1000);
 
         const endFunction = performance.now();
-        console.log(`User "${displayName}" loaded in ${endFunction - startFunction}ms`);
+        console.log(`User "${displayName}" loaded in ${Math.round(endFunction - startFunction)}ms`);
     } catch (error) {
         document.getElementById('rotating-circle').style.display = 'none';
         console.error('User Error:', error);
@@ -757,7 +757,9 @@ async function fetchChannelData(userName) {
 
         const endFunction = performance.now();
         console.log(
-            `User "${userLoaded.displayName}" with channel "${channelName}" loaded in ${endFunction - startFunction}ms`,
+            `User "${userLoaded.displayName}" with channel "${channelName}" loaded in ${Math.round(
+                endFunction - startFunction,
+            )}ms`,
         );
     } catch (error) {
         console.error('Channel Error:', error);
@@ -999,7 +1001,7 @@ async function getImageHash(imageURL) {
         const array = Array.from(new Uint8Array(buffer));
         const hash = array.map((byte) => byte.toString(16).padStart(2, '0')).join('');
 
-        setCookie(imageURL, hash, 1);
+        setCookie(imageURL, hash, 24);
 
         return hash;
     } catch (error) {
@@ -1011,15 +1013,17 @@ async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours, fallb
     const start = performance.now();
 
     try {
-        let cachedData = localStorage.getItem(key);
+        const cachedData = localStorage.getItem(key);
+        let cachedTime;
 
-        if (cachedData) {
-            const cachedTime = localStorage.getItem(`${key}_timestamp`);
-            if (cachedTime && Date.now() - parseInt(cachedTime) < expirationTimeInHours * 60 * 60 * 1000) {
-                cachedData = JSON.parse(cachedData);
-                console.log(`Key "${key}" fetched from cache in ${performance.now() - start}ms`);
-                if (cachedData) return cachedData;
-            }
+        if (key.includes(':')) cachedTime = getCookie(`${key}_timestamp`);
+
+        if (
+            cachedData &&
+            (!cachedTime || (cachedTime && Date.now() - parseInt(cachedTime) < expirationTimeInHours * 36000000))
+        ) {
+            console.log(`Key "${key}" fetched from cache in ${Math.round(performance.now() - start)}ms`);
+            return JSON.parse(cachedData);
         } else {
             const timeoutPromise = new Promise((_, reject) => {
                 setTimeout(() => {
@@ -1037,12 +1041,13 @@ async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours, fallb
             }
 
             localStorage.setItem(key, JSON.stringify(fetchedData));
-            localStorage.setItem(`${key}_timestamp`, Date.now().toString());
-            console.log(`Key "${key}" fetched in ${performance.now() - start}ms`);
+            if (key.includes(':')) setCookie(`${key}_timestamp`, Date.now(), expirationTimeInHours);
+
+            console.log(`Key "${key}" fetched in ${Math.round(performance.now() - start)}ms`);
             return fetchedData;
         }
     } catch (e) {
-        console.error(`Key "${key}" fetch failed in ${performance.now() - start}ms - ${e}`);
+        console.error(`Key "${key}" fetch failed in ${Math.round(performance.now() - start)}ms - ${e}`);
         return fallback ?? [];
     }
 }
@@ -1123,22 +1128,22 @@ window.maxWidthVisualizer = function () {
     }
 };
 
-window.clearStorage = function () {
+window.clearStorage = function (reload) {
     for (const key in localStorage) {
         if (localStorage.hasOwnProperty(key)) {
             localStorage.removeItem(key);
         }
     }
     setCookie('userName', '', -1);
-    location.reload();
+    if (reload) location.reload();
 };
 
-window.setCookie = function (name, value, days) {
+window.setCookie = function (name, value, hours) {
     let expires = '';
 
-    if (days) {
+    if (hours) {
         const expirationDate = new Date();
-        expirationDate.setTime(expirationDate.getTime() + days * 24 * 60 * 60 * 1000);
+        expirationDate.setTime(expirationDate.getTime() + hours * 3600000);
         expires = `; expires=${expirationDate.toUTCString()}; path=/`;
     }
 
@@ -1528,6 +1533,13 @@ window.badges = {
 };
 
 window.onload = async function () {
+    const lastChange = parseInt(getCookie('lastChange'));
+    if (!lastChange || Date.now() - lastChange > 86400000) {
+        console.log('Updating data after 24h...');
+        setCookie('lastChange', Date.now(), 48);
+        clearStorage();
+    }
+
     fetchData();
     maxWidthVisualizer();
 
