@@ -1349,6 +1349,11 @@ window.changeLinkAndTitle = function (channel) {
         document.title += ' in ' + channel;
     }
 
+    const ogTitleTag = document.querySelector('meta[property="og:title"]');
+    if (ogTitleTag) {
+        ogTitleTag.content = document.title;
+    }
+
     window.history.pushState({}, '', newLink);
 };
 
