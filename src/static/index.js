@@ -160,7 +160,7 @@ async function fetchUserData(userName) {
         if (!userData.length) {
             document.getElementById('rotating-circle').style.display = 'none';
             handleDisplayTextChange(userName);
-            changeLink();
+            changeLinkAndTitle();
             return;
         }
 
@@ -589,7 +589,7 @@ async function fetchUserData(userName) {
         userLoaded.displayName = displayName;
         userLoaded.userID = userID;
         userLoaded.loaded = true;
-        changeLink();
+        changeLinkAndTitle();
 
         if (!cosmeticsLoaded) {
             const sections = document.getElementById('sections');
@@ -755,7 +755,7 @@ async function fetchChannelData(userName) {
         //Display
         document.getElementById('rotating-circle').style.display = 'none';
         document.getElementById('customChannel').disabled = false;
-        changeLink(channelName);
+        changeLinkAndTitle(channelName);
 
         const endFunction = performance.now();
         console.log(
@@ -1332,18 +1332,21 @@ window.handleDisplayTextChange = function (value) {
     return value;
 };
 
-window.changeLink = function (channel) {
+window.changeLinkAndTitle = function (channel) {
     const user = getCookie('userName');
-    let newLink;
+    let newLink = '';
 
     if (!user) {
-        return;
+        newLink = '/';
+        document.title = 'Vanity Tester';
     } else {
         newLink = '?u=' + encodeURIComponent(user);
+        document.title = 'Vanity Tester | ' + user;
     }
 
     if (channel) {
         newLink += '&c=' + encodeURIComponent(channel);
+        document.title += ' in ' + channel;
     }
 
     window.history.pushState({}, '', newLink);
@@ -1397,7 +1400,7 @@ window.handleChannelChange = function (value) {
         if (!userLoaded.loaded || !value.length) {
             document.querySelector('.platform-twitch-channel').style.display = 'none';
             document.getElementById('customChannel').disabled = false;
-            changeLink();
+            changeLinkAndTitle();
             return;
         }
         fetchChannelData(value);
