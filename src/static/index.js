@@ -1,14 +1,15 @@
-import * as chatterino from '/providers/Chatterino.js';
-import * as ffzap from '/providers/FrankerFaceZAP.js';
-import * as dankchat from '/providers/DankChat.js';
-import * as purpletv from '/providers/PurpleTV.js';
-import * as ffz from '/providers/FrankerFaceZ.js';
-import * as chatsen from '/providers/Chatsen.js';
-import * as bttv from '/providers/BetterTTV.js';
-import * as twitch from '/providers/Twitch.js';
-import * as chatty from '/providers/Chatty.js';
-import * as homies from '/providers/Homies.js';
-import * as stv from '/providers/7TV.js';
+import * as chatterino from '../providers/Chatterino.js';
+import * as ffzap from '../providers/FrankerFaceZAP.js';
+import * as dankchat from '../providers/DankChat.js';
+import * as purpletv from '../providers/PurpleTV.js';
+import * as ffz from '../providers/FrankerFaceZ.js';
+import * as chatsen from '../providers/Chatsen.js';
+import * as bttv from '../providers/BetterTTV.js';
+import * as twitch from '../providers/Twitch.js';
+import * as chatty from '../providers/Chatty.js';
+import * as homies from '../providers/Homies.js';
+import * as stv from '../providers/7TV.js';
+import './main.css';
 
 let cosmeticsLoaded = false;
 let chatterinoIDs = [];
@@ -1575,7 +1576,7 @@ window.onload = async function () {
     userName = handleDisplayTextChange(userName);
     if (userName.length) {
         document.getElementById('editText').disabled = true;
-        
+
         clearBadges();
         loadingCircle();
         await fetchUserData(userName);

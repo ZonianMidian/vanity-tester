@@ -1,0 +1,15 @@
+# dependencies
+.yarn/install-state.gz
+/node_modules
+.pnp.js
+/.pnp
+
+# production
+/build
+/dist
+
+# locks
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
