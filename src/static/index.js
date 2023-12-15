@@ -851,6 +851,7 @@ function applyBadge(badgeLink, badgeName, platform, color, type) {
                         badgeLink = ffzCustomBadges.vip ?? badgeLink;
                     }
                     break;
+                case 'founder':
                 case 'subscriber':
                     divName = 'sub';
                     break;
