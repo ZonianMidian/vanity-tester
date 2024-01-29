@@ -566,8 +566,8 @@ async function fetchUserData(userName) {
             const badgeTile = devBadge
                 ? 'PurpleTV Developer'
                 : customBadge
-                  ? 'PurpleTV Custom Badge'
-                  : 'PurpleTV Donor Badge';
+                    ? 'PurpleTV Custom Badge'
+                    : 'PurpleTV Donor Badge';
             createBadgeElement(
                 `<img src='${userBadge}' alt='PurpleTV Badge'>`,
                 badgeTile,
@@ -1659,40 +1659,6 @@ document.querySelectorAll('.userBadge').forEach((badge) => {
     badge.addEventListener('dragend', () => {
         currentlyDragged = null;
     });
-});
-
-const konamiCode = [
-    'ArrowUp',
-    'ArrowUp',
-    'ArrowDown',
-    'ArrowDown',
-    'ArrowLeft',
-    'ArrowRight',
-    'ArrowLeft',
-    'ArrowRight',
-    'KeyB',
-    'KeyA',
-];
-let konamiCodePosition = 0;
-
-document.addEventListener('keydown', function (e) {
-    const key = e.code;
-
-    if (key === konamiCode[konamiCodePosition]) {
-        konamiCodePosition++;
-
-        if (konamiCodePosition === konamiCode.length) {
-            console.log('Konami Code Activated!');
-            const allCosmeticsDiv = document.querySelector('#paintsSection .allCosmetics');
-
-            if (allCosmeticsDiv) {
-                allCosmeticsDiv.classList.remove('invisibleElement');
-            }
-            konamiCodePosition = 0;
-        }
-    } else {
-        konamiCodePosition = 0;
-    }
 });
 
 document.addEventListener('keydown', function (event) {
