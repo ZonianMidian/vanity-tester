@@ -660,6 +660,11 @@ async function fetchChannelData(userName) {
 		document.getElementById('customChannel').value = channelName;
 
 		//Twitch Channel
+		const badges = document.querySelectorAll('.platform-twitch-channel');
+		badges.forEach((badge) => {
+			badge.innerHTML = '';
+		});
+
 		for (const badge of channelBadges) {
 			const versions = sortArray(badge.versions);
 			for (const version of versions) {
