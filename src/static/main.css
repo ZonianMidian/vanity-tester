@@ -1,453 +1,453 @@
 html {
-    overflow: scroll;
-    overflow-x: hidden;
+	overflow: scroll;
+	overflow-x: hidden;
 }
 
 :root {
-    --user-color: #ffffff;
-    scrollbar-width: none;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -khtml-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
+	--user-color: #ffffff;
+	scrollbar-width: none;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
 }
 
 ::-webkit-scrollbar {
-    width: 0;
-    background: transparent;
+	width: 0;
+	background: transparent;
 }
 
 ::-webkit-color-swatch {
-    border: none;
+	border: none;
 }
 
 ::-moz-color-swatch {
-    border: none;
+	border: none;
 }
 
 body {
-    background-color: #181818;
-    color: white;
-    text-align: center;
-    font-size: 24px;
-    font-weight: bold;
-    padding: 0 20px;
-    margin: 0;
-    font-family:
-        Inter,
-        Roobert,
-        Helvetica Neue,
-        Helvetica,
-        Arial,
-        sans-serif;
+	background-color: #181818;
+	color: white;
+	text-align: center;
+	font-size: 24px;
+	font-weight: bold;
+	padding: 0 20px;
+	margin: 0;
+	font-family:
+		Inter,
+		Roobert,
+		Helvetica Neue,
+		Helvetica,
+		Arial,
+		sans-serif;
 }
 
 #editText {
-    border: none;
-    color: white;
-    font-weight: bold;
-    margin: 0;
-    width: auto;
-    resize: none;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center;
-    width: auto;
-    overflow: visible;
-    white-space: nowrap;
+	border: none;
+	color: white;
+	font-weight: bold;
+	margin: 0;
+	width: auto;
+	resize: none;
+	background-repeat: no-repeat;
+	background-size: cover;
+	background-position: center;
+	width: auto;
+	overflow: visible;
+	white-space: nowrap;
 }
 
 #visualizer {
-    background-color: #181818;
-    position: sticky;
-    z-index: 10;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 7rem;
-    top: 0;
+	background-color: #181818;
+	position: sticky;
+	z-index: 10;
+	text-align: center;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 7rem;
+	top: 0;
 }
 
 .text-effect {
-    background-clip: text !important;
-    background-size: cover !important;
-    -webkit-background-clip: text !important;
-    -webkit-text-fill-color: transparent;
+	background-clip: text !important;
+	background-size: cover !important;
+	-webkit-background-clip: text !important;
+	-webkit-text-fill-color: transparent;
 }
 
 .text-effect::placeholder {
-    -webkit-text-fill-color: white;
-    opacity: 0.7;
+	-webkit-text-fill-color: white;
+	opacity: 0.7;
 }
 
 #editText:focus {
-    outline: none;
+	outline: none;
 }
 
 .allCosmetics,
 .userCosmetics {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    text-align: center;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
+	margin-bottom: 20px;
+	text-align: center;
 }
 
 .badge,
 .paint {
-    display: inline-block;
-    margin: 1px;
-    cursor: pointer;
-    transition: transform 0.3s ease-in-out;
+	display: inline-block;
+	margin: 1px;
+	cursor: pointer;
+	transition: transform 0.3s ease-in-out;
 }
 
 .badge img {
-    width: auto;
-    height: 50px;
-    transition: transform 0.3s ease-in-out;
+	width: auto;
+	height: 50px;
+	transition: transform 0.3s ease-in-out;
 }
 
 .badge:hover,
 .paint:hover {
-    transform: scale(1.1);
+	transform: scale(1.1);
 }
 
 header {
-    background-color: #222;
-    color: white;
-    padding: 10px 0;
+	background-color: #222;
+	color: white;
+	padding: 10px 0;
 }
 
 button {
-    color: white;
-    border: none;
-    padding: 10px 20px;
-    margin: 5px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 16px;
+	color: white;
+	border: none;
+	padding: 10px 20px;
+	margin: 5px;
+	cursor: pointer;
+	border-radius: 5px;
+	font-size: 16px;
 }
 
 .blue-button {
-    background-color: #007bff;
+	background-color: #007bff;
 }
 
 .blue-button:hover {
-    background-color: #0056b3;
+	background-color: #0056b3;
 }
 
 .purple-button {
-    background-color: #6f42c1;
+	background-color: #6f42c1;
 }
 
 .purple-button:hover {
-    background-color: #4a1a7a;
+	background-color: #4a1a7a;
 }
 
 .red-button {
-    background-color: #dc3545;
+	background-color: #dc3545;
 }
 
 .red-button:hover {
-    background-color: #a71d2a;
+	background-color: #a71d2a;
 }
 
 .badge,
 .paint {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background-color: #1f1f1f;
-    border-radius: 10px;
-    cursor: pointer;
-    font-size: 1rem;
-    overflow: hidden;
-    position: relative;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	background-color: #1f1f1f;
+	border-radius: 10px;
+	cursor: pointer;
+	font-size: 1rem;
+	overflow: hidden;
+	position: relative;
 }
 
 .badge {
-    width: 5rem;
-    height: 5rem;
+	width: 5rem;
+	height: 5rem;
 }
 
 .paint {
-    background-color: var(--user-color);
-    word-wrap: break-word;
-    height: 2rem;
-    padding: 5px;
+	background-color: var(--user-color);
+	word-wrap: break-word;
+	height: 2rem;
+	padding: 5px;
 }
 
 .badge img {
-    max-width: 80px;
-    max-height: 80px;
+	max-width: 80px;
+	max-height: 80px;
 }
 
 .badge:hover img {
-    transform: scale(1.1);
+	transform: scale(1.1);
 }
 
 .badge::after {
-    content: attr(data-badge-name);
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    background-color: rgba(0, 0, 0, 0.7);
-    color: white;
-    font-size: 12px;
-    padding: 3px;
-    box-sizing: border-box;
-    opacity: 0;
-    transition: opacity 0.3s ease-in-out;
+	content: attr(data-badge-name);
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.7);
+	color: white;
+	font-size: 12px;
+	padding: 3px;
+	box-sizing: border-box;
+	opacity: 0;
+	transition: opacity 0.3s ease-in-out;
 }
 
 .badge:hover::after {
-    opacity: 1;
+	opacity: 1;
 }
 
 .platform-subdiv {
-    display: none;
+	display: none;
 }
 
 .badges {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 10px;
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: 10px;
 }
 
 .badge-ffz img {
-    border-radius: 5px;
+	border-radius: 5px;
 }
 
 #allUserBadges div img {
-    width: auto;
+	width: auto;
 }
 
 #allUserBadges div img:active {
-    cursor: grabbing;
+	cursor: grabbing;
 }
 
 #allUserBadges div {
-    margin-right: 10px;
+	margin-right: 10px;
 }
 
 .userBadge {
-    cursor: grab;
+	cursor: grab;
 }
 
 .ffzBadge,
 .vipBadge,
 .moderatorBadge {
-    border-radius: 5px;
+	border-radius: 5px;
 }
 
 #menu {
-    position: fixed;
-    top: 0;
-    right: 0;
-    width: 300px;
-    height: 100%;
-    background-color: #222222;
-    color: #fff;
-    padding: 20px;
-    z-index: 1000;
-    flex-direction: column;
-    border-radius: 5px;
+	position: fixed;
+	top: 0;
+	right: 0;
+	width: 300px;
+	height: 100%;
+	background-color: #222222;
+	color: #fff;
+	padding: 20px;
+	z-index: 1000;
+	flex-direction: column;
+	border-radius: 5px;
 }
 
 .hidden {
-    display: none;
+	display: none;
 }
 
 .menu-section {
-    display: flex;
-    justify-content: space-between;
+	display: flex;
+	justify-content: space-between;
 }
 
 .provider-list {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
+	display: flex;
+	justify-content: center;
+	flex-wrap: wrap;
+	gap: 10px;
 }
 
 label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    font-weight: normal;
+	display: flex;
+	align-items: center;
+	cursor: pointer;
+	font-weight: normal;
 }
 
 .provider-list input {
-    margin-right: 5px;
+	margin-right: 5px;
 }
 
 #search-button,
 .gear-button {
-    font-size: 2rem !important;
-    position: fixed;
-    bottom: 10px;
-    background: #7b7b7b1a;
-    border: none;
-    color: #7b7b7b;
-    cursor: pointer;
-    z-index: 100;
+	font-size: 2rem !important;
+	position: fixed;
+	bottom: 10px;
+	background: #7b7b7b1a;
+	border: none;
+	color: #7b7b7b;
+	cursor: pointer;
+	z-index: 100;
 }
 
 #search-field {
-    font-size: 2rem !important;
-    margin: 5px -10px;
-    height: 56.8px;
-    border-radius: 5px;
-    padding: 0 10px;
-    position: fixed;
-    bottom: 10px;
-    background: #7b7b7b3a;
-    color: #7b7b7b;
-    z-index: 100;
-    outline: none;
-    border: none;
-    display: none;
+	font-size: 2rem !important;
+	margin: 5px -10px;
+	height: 56.8px;
+	border-radius: 5px;
+	padding: 0 10px;
+	position: fixed;
+	bottom: 10px;
+	background: #7b7b7b3a;
+	color: #7b7b7b;
+	z-index: 100;
+	outline: none;
+	border: none;
+	display: none;
 }
 
 .gear-button {
-    right: 5px;
+	right: 5px;
 }
 
 #search-button {
-    left: 5px;
+	left: 5px;
 }
 
 .close-button {
-    position: absolute;
-    top: 0;
-    right: 0;
-    font-size: 24px;
-    background: none;
-    border: none;
-    color: #fff;
-    cursor: pointer;
+	position: absolute;
+	top: 0;
+	right: 0;
+	font-size: 24px;
+	background: none;
+	border: none;
+	color: #fff;
+	cursor: pointer;
 }
 
 #colorPicker {
-    cursor: pointer;
+	cursor: pointer;
 }
 
 .text-box {
-    font-size: 1rem;
-    border-radius: 5px;
-    height: 2rem;
-    width: 10rem;
-    padding: 0 10px;
-    outline: none;
-    border: none;
+	font-size: 1rem;
+	border-radius: 5px;
+	height: 2rem;
+	width: 10rem;
+	padding: 0 10px;
+	outline: none;
+	border: none;
 }
 
 .text-div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 10px 0;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	margin: 10px 0;
 }
 
 .invisibleElement {
-    visibility: hidden;
-    position: absolute;
-    top: -9999px;
+	visibility: hidden;
+	position: absolute;
+	top: -9999px;
 }
 
 .visibleElement {
-    visibility: visible;
-    position: static;
+	visibility: visible;
+	position: static;
 }
 
 #rotating-circle {
-    font-size: 15rem !important;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    opacity: 0.5;
-    z-index: -1;
+	font-size: 15rem !important;
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+	opacity: 0.5;
+	z-index: -1;
 }
 
 @media (max-width: 1023px) {
-    #allUserBadges div {
-        margin-right: 5px;
-    }
+	#allUserBadges div {
+		margin-right: 5px;
+	}
 
-    .badge {
-        width: 3.5rem;
-        height: 3.5rem;
-    }
+	.badge {
+		width: 3.5rem;
+		height: 3.5rem;
+	}
 
-    .badge img {
-        max-width: 30px;
-        max-height: 30px;
-    }
+	.badge img {
+		max-width: 30px;
+		max-height: 30px;
+	}
 
-    .badge,
-    .paint {
-        font-size: 0.9rem;
-    }
+	.badge,
+	.paint {
+		font-size: 0.9rem;
+	}
 
-    .badges {
-        gap: 5px;
-    }
+	.badges {
+		gap: 5px;
+	}
 
-    .paint {
-        padding: 0;
-    }
+	.paint {
+		padding: 0;
+	}
 
-    #search-button,
-    .gear-button {
-        font-size: 1rem !important;
-        bottom: 0px;
-    }
+	#search-button,
+	.gear-button {
+		font-size: 1rem !important;
+		bottom: 0px;
+	}
 
-    #search-button {
-        left: 0;
-    }
+	#search-button {
+		left: 0;
+	}
 
-    .gear-button {
-        right: 0;
-    }
+	.gear-button {
+		right: 0;
+	}
 
-    #menu {
-        font-size: 20px !important;
-        width: 300px;
-        height: auto;
-        padding: 10px;
-        top: 0;
-        right: 0;
-    }
+	#menu {
+		font-size: 20px !important;
+		width: 300px;
+		height: auto;
+		padding: 10px;
+		top: 0;
+		right: 0;
+	}
 
-    #search-field {
-        font-size: 1rem !important;
-        margin: 0;
-        height: 28.4px;
-        bottom: 5px;
-        left: 5px;
-    }
+	#search-field {
+		font-size: 1rem !important;
+		margin: 0;
+		height: 28.4px;
+		bottom: 5px;
+		left: 5px;
+	}
 
-    #visualizer {
-        height: 4rem;
-    }
+	#visualizer {
+		height: 4rem;
+	}
 
-    #allUserBadges div img {
-        width: auto;
-        max-height: 40px;
-    }
+	#allUserBadges div img {
+		width: auto;
+		max-height: 40px;
+	}
 }
 
 @media (max-height: 719px) {
-    #menu {
-        font-size: 21.5px !important;
-    }
+	#menu {
+		font-size: 21.5px !important;
+	}
 }
