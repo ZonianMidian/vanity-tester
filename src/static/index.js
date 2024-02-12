@@ -194,7 +194,7 @@ async function fetchUserData(userName) {
 			'No Twitch Badge',
 			() => clearBadges('twitch'),
 			'twitch-base',
-			earnedBadges.length > 0,
+			earnedBadges.length,
 		);
 
 		for (const badge of twitchBadges) {
@@ -253,12 +253,11 @@ async function fetchUserData(userName) {
 			'No BTTV Badge',
 			() => clearBadges('bttv'),
 			'bttv',
-			bttvData.filter((u) => u.providerId == userID).length > 0,
+			bttvData.filter((u) => u.providerId == userID).length,
 		);
 
 		for (const badge of bttvBadges) {
-			const userHasBadge =
-				bttvData.filter((u) => u.providerId == userID && u.badge.type == badge.type).length > 0;
+			const userHasBadge = bttvData.filter((u) => u.providerId == userID && u.badge.type == badge.type).length;
 			const badgeImage = badge.svg;
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='BTTV Badge'>`,
@@ -329,10 +328,6 @@ async function fetchUserData(userName) {
 			const colorCode = badge.badge_is_colored ? badge.badge_color : null;
 			const title = 'FFZ:AP Supporter';
 
-			if (userHasBadge) {
-				applyBadge(badgeLink, ffzap.helpers[badge.id] ?? title, 'ffzap', colorCode);
-			}
-
 			let removedFromGlobal = true;
 			if (badge.tier == 3) {
 				const badgeHash = await getImageHash(badgeLink);
@@ -341,6 +336,10 @@ async function fetchUserData(userName) {
 					tier3Hashes.push(badgeHash);
 					removedFromGlobal = false;
 				}
+			}
+
+			if (userHasBadge) {
+				applyBadge(badgeLink, ffzap.helpers[badge.id] ?? title, 'ffzap', colorCode);
 			}
 
 			createBadgeElement(
@@ -352,6 +351,7 @@ async function fetchUserData(userName) {
 				removedFromGlobal,
 			);
 		}
+		selectedBadges('ffzap');
 
 		//Chatterino
 		createBadgeElement(
@@ -439,7 +439,7 @@ async function fetchUserData(userName) {
 			'No 7TV Badge',
 			() => clearBadges('7tv'),
 			'7tv',
-			stvUserBadges.length > 0,
+			stvUserBadges.length,
 		);
 
 		for (const badge of stvCosmetics.badges) {
@@ -459,14 +459,15 @@ async function fetchUserData(userName) {
 			}
 		}
 
-		createPaintElement('No 7TV Paint', 'var(--user-color)', clearPaint, null, stvUserPaints.length > 0);
+		createPaintElement('No 7TV Paint', 'var(--user-color)', clearPaint, 'noPaint', stvUserPaints.length);
+		let paintSelected = false;
 
 		for (const paint of stvCosmetics.paints) {
 			const paintID = paint.id;
 			createPaintElement(
 				paint.name,
 				'',
-				() => applyPaint('userName', paint),
+				() => applyPaint('userName', paint, true),
 				paintID,
 				stvUserCosmetics.includes(paintID),
 			);
@@ -474,9 +475,16 @@ async function fetchUserData(userName) {
 
 			const getPaint = getStvUserCosmetics?.find((x) => x.id == paintID);
 			if (getPaint?.selected) {
+				paintSelected = true;
 				userLoaded.paint = paint;
-				applyPaint('userName', paint);
+				applyPaint('userName', paint, true);
 			}
+		}
+
+		if (!paintSelected) {
+			document.querySelectorAll('[data-paint-id=noPaint]').forEach((noPaint) => {
+				noPaint.parentElement.style.backgroundColor = '#454545';
+			});
 		}
 
 		//Chatsen
@@ -490,7 +498,7 @@ async function fetchUserData(userName) {
 
 		const chatsenUser = chatsenBadges.users.find((u) => u.id == String(userID));
 		for (const badge of chatsenBadges.badges) {
-			const userHasBadge = chatsenUser?.badges.filter((b) => b.badgeName == badge.name).length > 0;
+			const userHasBadge = chatsenUser?.badges.filter((b) => b.badgeName == badge.name).length;
 			createBadgeElement(
 				`<img src='${badge.image}' alt='Chatsen Badge'>`,
 				badge.title,
@@ -520,13 +528,13 @@ async function fetchUserData(userName) {
 			createBadgeElement(
 				`<img src='${homiesBadge.image3}' alt='Homies Badge'>`,
 				badgeName,
-				() => applyBadge(homiesBadge.image3, badgeName, 'user'),
+				() => applyBadge(homiesBadge.image3, badgeName, 'homies', null, 'user'),
 				'homies',
 				true,
 				true,
 			);
 
-			applyBadge(homiesBadge.image3, badgeName, 'user');
+			applyBadge(homiesBadge.image3, badgeName, 'homies', null, 'user');
 		}
 
 		for (const badge of homiesBadges) {
@@ -534,13 +542,13 @@ async function fetchUserData(userName) {
 			createBadgeElement(
 				`<img src='${badge.image3}' alt='Homies Badge'>`,
 				badge.tooltip,
-				() => applyBadge(badge.image3, badge.tooltip, 'homies-base'),
+				() => applyBadge(badge.image3, badge.tooltip, 'homies'),
 				'homies',
 				userHasBadge,
 			);
 
 			if (userHasBadge) {
-				applyBadge(badge.image3, badge.tooltip, 'homies-base');
+				applyBadge(badge.image3, badge.tooltip, 'homies');
 			}
 		}
 
@@ -556,13 +564,12 @@ async function fetchUserData(userName) {
 		let purpleUniqueBadges = [];
 
 		for (const user of purpletvBadges.users) {
-			const customBadge = user.badgeUrl.length > 0;
+			const customBadge = user.badgeUrl.length;
 			const devBadge = user.userId == '157861306';
 			const userHasBadge = user.userId == String(userID);
-			const userBadge =
-				user.badgeUrl.length > 0
-					? user.badgeUrl.replace('nopbreak.ru', 'nopbreak.ws')
-					: purpletvBadges.defaultBadgeUrl;
+			const userBadge = user.badgeUrl.length
+				? user.badgeUrl.replace('nopbreak.ru', 'nopbreak.ws')
+				: purpletvBadges.defaultBadgeUrl;
 			const badgeTile = devBadge
 				? 'PurpleTV Developer'
 				: customBadge
@@ -585,7 +592,7 @@ async function fetchUserData(userName) {
 
 		//Display
 		userLoaded.ffzBadges = ffzIDs.includes(userID);
-		userLoaded.tBadges = earnedBadges.length > 0;
+		userLoaded.tBadges = earnedBadges.length;
 		userLoaded.displayName = displayName;
 		userLoaded.userID = userID;
 		userLoaded.loaded = true;
@@ -660,8 +667,8 @@ async function fetchChannelData(userName) {
 		document.getElementById('customChannel').value = channelName;
 
 		//Twitch Channel
-		const badges = document.querySelectorAll('.platform-twitch-channel');
-		badges.forEach((badge) => {
+		const twitchChannelBadges = document.querySelectorAll('.platform-twitch-channel');
+		twitchChannelBadges.forEach((badge) => {
 			badge.innerHTML = '';
 		});
 
@@ -704,7 +711,7 @@ async function fetchChannelData(userName) {
 				'No Twitch Badge',
 				() => clearBadges('twitch'),
 				'twitch-channel',
-				earnedBadges.length > 0,
+				earnedBadges.length,
 				true,
 			);
 
@@ -751,7 +758,7 @@ async function fetchChannelData(userName) {
 					true,
 				);
 
-				if (displayBadges.filter((b) => b.setID == badge.setID && b.version == badge.version).length > 0) {
+				if (displayBadges.filter((b) => b.setID == badge.setID && b.version == badge.version).length) {
 					applyBadge(badgeLink, badge.title, 'twitch', badgeColor, badge.setID);
 				}
 			}
@@ -889,13 +896,20 @@ function applyBadge(badgeLink, badgeName, platform, color, type) {
 				divName = 'chatsen-base';
 			}
 			break;
+		case 'homies':
+			if (type == 'user') {
+				divName = 'user';
+			} else {
+				divName = 'homies-base';
+			}
+			break;
 		default:
 			divName = platform;
 			break;
 	}
 	const platformSubdiv = allUserBadges.querySelector(`.badge-${divName}`);
 
-	clearBadges(divName);
+	clearBadges(divName, platform);
 
 	if (platformSubdiv) {
 		platformSubdiv.style.display = '';
@@ -904,7 +918,22 @@ function applyBadge(badgeLink, badgeName, platform, color, type) {
 		platformSubdiv.appendChild(badgeImage);
 	}
 
+	selectedBadges(platform);
 	maxWidthVisualizer();
+}
+
+function selectedBadges(platform) {
+	const badges = [];
+	document.querySelectorAll(`.badge-${platform} img`).forEach((img) => {
+		badges.push(img.src);
+	});
+
+	document.querySelectorAll('div.badge img').forEach(function (img) {
+		if (badges.includes(img.src)) {
+			const parentDiv = img.parentNode;
+			parentDiv.style.backgroundColor = '#454545';
+		}
+	});
 }
 
 function createBadgeImage(link, title, color) {
@@ -923,9 +952,13 @@ function createBadgeImage(link, title, color) {
 	return badgeImage;
 }
 
-function clearBadges(platform) {
+function clearBadges(divName, platform) {
+	document
+		.querySelectorAll(`.platform-${platform ?? divName} div`)
+		.forEach((badge) => (badge.style.backgroundColor = ''));
+
 	const badgesSection = document.getElementById('allUserBadges');
-	if (!platform) {
+	if (!divName) {
 		const subDivs = badgesSection.querySelectorAll('div');
 
 		for (const div of subDivs) {
@@ -939,8 +972,8 @@ function clearBadges(platform) {
 		return;
 	}
 
-	const badges = badgesSection.querySelectorAll(`.badge-${platform}`);
-	for (const badge of badges) {
+	const allBadges = badgesSection.querySelectorAll(`.badge-${divName}`);
+	for (const badge of allBadges) {
 		const badgeImg = badge.querySelector('img');
 		badge.style.display = 'none';
 		if (badgeImg) {
@@ -950,10 +983,16 @@ function clearBadges(platform) {
 	maxWidthVisualizer();
 }
 
-function applyPaint(ID, paint) {
+function applyPaint(ID, paint, selected) {
 	if (!paint) return;
+	if (selected) {
+		clearSelectedPaint();
+		document.querySelectorAll(`[data-paint-id='${paint.id}']`).forEach((element) => {
+			element.parentNode.style.backgroundColor = '#454545';
+		});
+	}
 	document.querySelectorAll(`[data-paint-id='${ID}']`).forEach((editText) => {
-		if (paint.function === 'LINEAR_GRADIENT' && paint.stops && paint.stops.length > 0) {
+		if (paint.function === 'LINEAR_GRADIENT' && paint.stops && paint.stops.length) {
 			const gradientStops = paint.stops.map((stop) => {
 				const colorString = '#' + (stop.color >>> 0).toString(16).padStart(8, '0');
 				return `${colorString} ${stop.at * 100}%`;
@@ -963,7 +1002,7 @@ function applyPaint(ID, paint) {
 				? `repeating-linear-gradient(${gradientDirection}, ${gradientStops.join(', ')})`
 				: `linear-gradient(${gradientDirection}, ${gradientStops.join(', ')})`;
 			editText.style.backgroundImage = gradient;
-		} else if (paint.function === 'RADIAL_GRADIENT' && paint.stops && paint.stops.length > 0) {
+		} else if (paint.function === 'RADIAL_GRADIENT' && paint.stops && paint.stops.length) {
 			const gradientStops = paint.stops.map((stop) => {
 				const colorString = '#' + (stop.color >>> 0).toString(16).padStart(8, '0');
 				return `${colorString} ${stop.at * 100}%`;
@@ -974,7 +1013,7 @@ function applyPaint(ID, paint) {
 			editText.style.backgroundImage = `url('${paint.image_url}')`;
 		}
 
-		if (paint.shadows && paint.shadows.length > 0) {
+		if (paint.shadows && paint.shadows.length) {
 			const dropShadows = paint.shadows.map((shadow) => {
 				const colorString = '#' + (shadow.color >>> 0).toString(16).padStart(8, '0');
 				return `drop-shadow(${colorString} ${shadow.x_offset}px ${shadow.y_offset}px ${shadow.radius}px)`;
@@ -990,6 +1029,17 @@ function clearPaint() {
 	const editText = document.getElementById('editText');
 	editText.style.backgroundImage = '';
 	editText.style.filter = '';
+
+	clearSelectedPaint();
+	document.querySelectorAll('[data-paint-id=noPaint]').forEach((noPaint) => {
+		noPaint.parentElement.style.backgroundColor = '#454545';
+	});
+}
+
+function clearSelectedPaint() {
+	document.querySelectorAll('.paint').forEach((paint) => {
+		paint.parentElement.style.backgroundColor = '';
+	});
 }
 
 async function getImageHash(imageURL) {
@@ -1309,20 +1359,24 @@ window.createPaintElement = function (paintName, backgroundColor, onClickHandler
 	const allPaints = paintsSection.querySelector('.allCosmetics');
 	const userPaints = paintsSection.querySelector('.userCosmetics');
 
+	const parentDiv = document.createElement('div');
+	parentDiv.className = 'paintContainer';
+
 	const paintElement = document.createElement('div');
 	paintElement.className = 'paint text-effect';
 	paintElement.textContent = paintName;
 	paintElement.style.backgroundColor = backgroundColor;
 	paintElement.onclick = onClickHandler;
+	parentDiv.appendChild(paintElement);
 
 	if (id) {
 		paintElement.dataset.paintId = id;
 	}
 
-	if (!cosmeticsLoaded) allPaints.appendChild(paintElement);
+	if (!cosmeticsLoaded) allPaints.appendChild(parentDiv);
 
 	if (userHasPaint) {
-		const clonedPaintElement = paintElement.cloneNode(true);
+		const clonedPaintElement = parentDiv.cloneNode(true);
 		clonedPaintElement.onclick = onClickHandler;
 		userPaints.appendChild(clonedPaintElement);
 	}
@@ -1455,7 +1509,7 @@ window.toggleProvider = function (providerId) {
 		}
 	} else if (providerId == '7tv') {
 		if (isCheckboxChecked) {
-			applyPaint('userName', userLoaded.paint);
+			applyPaint('userName', userLoaded.paint, true);
 		} else {
 			clearPaint();
 		}
@@ -1613,7 +1667,15 @@ window.addEventListener('dragover', (e) => {
 
 window.addEventListener('drop', () => {
 	if (currentlyDragged && !container) {
+		const badgeImg = currentlyDragged.querySelector('img');
 		currentlyDragged.style.display = 'none';
+		if (badgeImg) {
+			badgeImg.remove();
+		}
+
+		const platform = currentlyDragged.classList[0].replace('badge-', '');
+		document.querySelectorAll(`.platform-${platform} div`).forEach((badge) => (badge.style.backgroundColor = ''));
+		selectedBadges(platform);
 	}
 });
 
