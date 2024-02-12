@@ -1,6 +1,6 @@
 export async function getUserID(userID) {
 	try {
-		const getStvData = await fetch(`${window.cors}https://7tv.io/v3/users/twitch/${userID}`);
+		const getStvData = await fetch(`https://7tv.io/v3/users/twitch/${userID}`);
 
 		if (!getStvData.ok) {
 			throw new Error();
@@ -16,7 +16,7 @@ export async function getUserID(userID) {
 export async function getUserCosmetics(stvID) {
 	let retryCount = 0;
 	while (retryCount <= 5) {
-		const getUserCosmetics = await fetch(`${window.cors}https://7tv.io/v3/gql`, {
+		const getUserCosmetics = await fetch(`https://7tv.io/v3/gql`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',
@@ -62,7 +62,7 @@ export async function getCosmetics() {
 	let retryCount = 0;
 
 	while (retryCount < 5) {
-		const getCosmetics = await fetch(`${window.cors}https://7tv.io/v3/gql`, {
+		const getCosmetics = await fetch(`https://7tv.io/v3/gql`, {
 			method: 'POST',
 			headers: {
 				'Content-Type': 'application/json',

@@ -1659,7 +1659,7 @@ window.onload = async function () {
 	}
 };
 
-window.cors = 'https://corsproxy.io/?';
+window.cors = 'https://corsproxy.org/?';
 
 window.addEventListener('dragover', (e) => {
 	e.preventDefault();
