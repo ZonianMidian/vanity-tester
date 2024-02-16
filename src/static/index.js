@@ -34,22 +34,39 @@ let ffzIDs = [];
 let dankBadges;
 let ffzBadges;
 let bttvData;
+let dankData;
 
 async function fetchData() {
 	const startFunction = performance.now();
+	const results = await Promise.allSettled([
+		getCachedOrFetch('purpletvBadges', () => purpletv.getBadges(), 24, purpletv.fallback),
+		getCachedOrFetch('chatsenBadges', () => chatsen.getBadges(), 24, chatsen.fallback),
+		getCachedOrFetch('homiesCustomBadges', () => homies.getCustomBadges(), 24),
+		getCachedOrFetch('chatterinoBadges', () => chatterino.getBadges(), 24),
+		getCachedOrFetch('ffzBadges', () => ffz.getBadges(), 24, ffz.fallback),
+		getCachedOrFetch('dankchatBadges', () => dankchat.getBadges(), 24),
+		getCachedOrFetch('homiesBadges', () => homies.getBadges(), 24),
+		getCachedOrFetch('chattyBadges', () => chatty.getBadges(), 24),
+		getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24),
+		getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24),
+		getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24),
+		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24)
+	]).then(res => res.map((result) => result.value));
 
-	purpletvBadges = await getCachedOrFetch('purpletvBadges', () => purpletv.getBadges(), 24, purpletv.fallback);
-	chatsenBadges = await getCachedOrFetch('chatsenBadges', () => chatsen.getBadges(), 24, chatsen.fallback);
-	homiesCustomBadges = await getCachedOrFetch('homiesCustomBadges', () => homies.getCustomBadges(), 24);
-	chatterinoBadges = await getCachedOrFetch('chatterinoBadges', () => chatterino.getBadges(), 24);
-	const dankData = await getCachedOrFetch('dankchatBadges', () => dankchat.getBadges(), 24);
-	ffzBadges = await getCachedOrFetch('ffzBadges', () => ffz.getBadges(), 24, ffz.fallback);
-	homiesBadges = await getCachedOrFetch('homiesBadges', () => homies.getBadges(), 24);
-	chattyBadges = await getCachedOrFetch('chattyBadges', () => chatty.getBadges(), 24);
-	stvCosmetics = await getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24);
-	twitchBadges = await getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24);
-	ffzapBadges = await getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24);
-	bttvData = await getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24);
+	[
+		purpletvBadges,
+		chatsenBadges,
+		homiesCustomBadges,
+		chatterinoBadges,
+		ffzBadges,
+		dankData,
+		homiesBadges,
+		chattyBadges,
+		stvCosmetics,
+		twitchBadges,
+		ffzapBadges,
+		bttvData,
+	] = results;
 
 	//PurpleTV
 	purpletvIDs = purpletvBadges.users.map((b) => parseInt(b.userId));
