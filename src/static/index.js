@@ -1676,7 +1676,7 @@ window.onload = async function () {
 	}
 };
 
-window.cors = 'https://corsproxy.org/?';
+window.cors = 'https://api.spanix.team/proxy/';
 
 window.addEventListener('dragover', (e) => {
 	e.preventDefault();
