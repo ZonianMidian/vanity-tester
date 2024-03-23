@@ -33,7 +33,7 @@ export async function getBadges() {
 
 export async function getUserBadges(channelID, channelName, userName, filter) {
 	if (!userName) userName = channelName;
-	const getUserBadges = await fetch(`${window.cors}https://gql.twitch.tv/gql`, {
+	const getUserBadges = await fetch(`https://gql.twitch.tv/gql`, {
 		credentials: 'omit',
 		method: 'POST',
 		headers: {
