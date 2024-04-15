@@ -1665,7 +1665,6 @@ window.onload = async function () {
 		clearBadges();
 		loadingCircle();
 		await fetchUserData(userName);
-		handleDisplayTextChange(userName);
 	}
 
 	setTimeout(() => maxWidthVisualizer(), 1000);
