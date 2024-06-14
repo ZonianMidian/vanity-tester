@@ -1161,6 +1161,12 @@ function loadingCircle() {
 	document.getElementById('user-arrow').style.display = 'none';
 }
 
+function sendStats(name, data) {
+	if (window.umami) {
+		window.umami.track(name, data ?? {});
+	};
+}
+
 const firstSize = '70px';
 let badgeSize = firstSize;
 
@@ -1240,18 +1246,18 @@ window.getCookie = function (name) {
 	return null;
 };
 
-let timeoutId;
+let timeoutId_textChange;
 window.handleTextChange = function (element) {
 	const newText = handleDisplayTextChange(element.value);
 	if (!newText.length) return;
 
-	if (timeoutId) {
-		clearTimeout(timeoutId);
+	if (timeoutId_textChange) {
+		clearTimeout(timeoutId_textChange);
 	}
 
 	if (newText.toLocaleLowerCase() == userLoaded.displayName.toLocaleLowerCase() || !newText.length) return;
 
-	timeoutId = setTimeout(() => {
+	timeoutId_textChange = setTimeout(() => {
 		document.getElementById('editText').disabled = true;
 
 		clearBadges();
@@ -1279,12 +1285,19 @@ window.handleTextChange = function (element) {
 				fetchChannelData(channelName);
 			}
 		});
+
+		sendStats('vanity', {
+			user: newText
+		})
 	}, 2000);
 };
 
 window.toggleFFZBadges = function () {
 	const checkbox = document.getElementById(`check-ffzbadges`);
 	const displayValue = checkbox.checked;
+	sendStats('toggle-ffz-custom', {
+		value: displayValue
+	})
 
 	if (displayValue) {
 		handleCustomBadges(ffzCustomBadges.mod, ffzCustomBadges.vip);
@@ -1308,16 +1321,23 @@ window.adjustInputWidth = function () {
 window.toggleSection = function (sectionId) {
 	const mainSection = document.getElementById(sectionId);
 	const button = document.getElementById(`toggle-${sectionId}`);
+	let value = null;
 
 	if (mainSection) {
 		if (mainSection.style.display === 'none') {
 			mainSection.style.display = 'block';
 			if (button) button.style.backgroundColor = '';
+			value = true;
 		} else {
 			mainSection.style.display = 'none';
 			if (button) button.style.backgroundColor = '#0054ae';
+			value = false;
 		}
 	}
+
+	sendStats(`button-${sectionId}`, {
+		value
+	})
 };
 
 window.toggleMode = function () {
@@ -1346,6 +1366,10 @@ window.toggleMode = function () {
 	} else {
 		button.textContent = 'Free Mode';
 	}
+
+	sendStats('vanity', {
+		mode: button.textContent
+	})
 };
 
 window.createBadgeElement = function (badgeImage, badgeName, onClickHandler, platform, userHasBadge, allRemoved) {
@@ -1436,6 +1460,10 @@ window.changeLinkAndTitle = function (channel) {
 
 window.handleColorChange = function (value) {
 	value = value?.toUpperCase() || '#FFFFFF';
+	sendStats('vanity', {
+		color: value
+	})
+
 	document.documentElement.style.setProperty('--user-color', value);
 	document.getElementById('editText').style.backgroundColor = value;
 	document.getElementById('colorPicker').value = value;
@@ -1486,12 +1514,19 @@ window.handleChannelChange = function (value) {
 			return;
 		}
 		fetchChannelData(value);
+
+		sendStats('vanity', {
+			channel: value
+		})
 	}, 2000);
 };
 
 window.toggleProvider = function (providerId) {
 	const checkbox = document.getElementById(`check-${providerId}`);
 	const isCheckboxChecked = checkbox.checked;
+	sendStats(`provider-${providerId}`, {
+		value: isCheckboxChecked
+	})
 
 	const platformElements = document.querySelectorAll(`.platform-${providerId}`);
 	platformElements.forEach((element) => {
@@ -1557,6 +1592,7 @@ window.showSearchField = function () {
 	}, 0);
 };
 
+let timeoutId_search;
 window.filterItems = function (value) {
 	const searchField = value.toLowerCase();
 	const sections = document.getElementById('sections').children;
@@ -1599,6 +1635,16 @@ window.filterItems = function (value) {
 			}
 		}
 	}
+
+	if (timeoutId_search) {
+		clearTimeout(timeoutId_search);
+	}
+
+	timeoutId_search = setTimeout(() => {
+		sendStats('search', {
+			value: searchField
+		})
+	}, 2000);
 };
 
 window.clearFilter = function (menu) {
@@ -1673,6 +1719,11 @@ window.onload = async function () {
 		loadingCircle();
 		await fetchChannelData(channelName);
 	}
+
+	sendStats('load-link', {
+		user: userName ?? '',
+		channel: channelName ?? ''
+	})
 };
 
 window.cors = 'https://api.spanix.team/proxy/';
