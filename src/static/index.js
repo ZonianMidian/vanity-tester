@@ -1287,7 +1287,7 @@ window.handleTextChange = function (element) {
 		});
 
 		sendStats('vanity', {
-			user: newText
+			user: newText?.toLowerCase()
 		})
 	}, 2000);
 };
@@ -1367,7 +1367,7 @@ window.toggleMode = function () {
 		button.textContent = 'Free Mode';
 	}
 
-	sendStats('vanity', {
+	sendStats('vanity-mode', {
 		mode: button.textContent
 	})
 };
@@ -1460,7 +1460,7 @@ window.changeLinkAndTitle = function (channel) {
 
 window.handleColorChange = function (value) {
 	value = value?.toUpperCase() || '#FFFFFF';
-	sendStats('vanity', {
+	sendStats('vanity-color', {
 		color: value
 	})
 
@@ -1516,7 +1516,7 @@ window.handleChannelChange = function (value) {
 		fetchChannelData(value);
 
 		sendStats('vanity', {
-			channel: value
+			channel: value?.toLowerCase()
 		})
 	}, 2000);
 };
@@ -1641,9 +1641,11 @@ window.filterItems = function (value) {
 	}
 
 	timeoutId_search = setTimeout(() => {
-		sendStats('search', {
-			value: searchField
-		})
+		if (searchField.length) {
+			sendStats('search', {
+				value: searchField
+			})
+		}
 	}, 2000);
 };
 
@@ -1721,8 +1723,8 @@ window.onload = async function () {
 	}
 
 	sendStats('load-link', {
-		user: userName ?? '',
-		channel: channelName ?? ''
+		user: userName?.toLowerCase() ?? '',
+		channel: channelName?.toLowerCase() ?? ''
 	})
 };
 
