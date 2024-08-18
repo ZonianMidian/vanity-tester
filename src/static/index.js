@@ -585,7 +585,7 @@ async function fetchUserData(userName) {
 			const devBadge = user.userId == '157861306';
 			const userHasBadge = user.userId == String(userID);
 			const userBadge = user.badgeUrl.length
-				? user.badgeUrl.replace('nopbreak.ru', 'nopbreak.ws')
+				? user.badgeUrl
 				: purpletvBadges.defaultBadgeUrl;
 			const badgeTile = devBadge
 				? 'PurpleTV Developer'
