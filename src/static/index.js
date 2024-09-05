@@ -1024,7 +1024,9 @@ function applyPaint(ID, paint, selected) {
 				const colorString = '#' + (stop.color >>> 0).toString(16).padStart(8, '0');
 				return `${colorString} ${stop.at * 100}%`;
 			});
-			const gradient = `repeating-radial-gradient(circle, ${gradientStops.join(', ')})`;
+			const gradient = paint.repeat
+				? `repeating-radial-gradient(circle, ${gradientStops.join(', ')})`
+				: `radial-gradient(circle, ${gradientStops.join(', ')})`;
 			editText.style.backgroundImage = gradient;
 		} else if (paint.function === 'URL' && paint.image_url) {
 			editText.style.backgroundImage = `url('${paint.image_url}')`;
