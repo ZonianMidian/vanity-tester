@@ -138,19 +138,18 @@ export async function getUserData(userID) {
 	return await getUserCosmetics(stvID);
 }
 
-export const subRole = '6076a86b09a4c63a38ebe801';
+export const subRole = '01F37R3RFR0000K96678WEQT01';
 
 const removedBadges = [
-	'60cd64d6f959f994a3c3849a', //7TV Admin
-	'60cd6511f959f994a3c3849b', //7TV Dungeon Mistress
-	'60cd6533f959f994a3c3849c', //7TV Moderator
-	'60d5998fb0ac44b85331fe2b', //7TV Contributor
-	'612f92abe1280b72b856b4d4', //7TV Subscriber (Founder)
-	'61a8d4c45c4db175e98a5ea1', //7TV Subscriber (1 Month)
-	'61a8d5fc5c4db175e98a5ea2', //7TV Subscriber (3 Months)
-	'61a8d7625c4db175e98a5ea3', //7TV Subscriber (6 Months)
-	'61a8d8be5c4db175e98a5ea4', //7TV Subscriber (9 Months)
-	'61a8d9045c4db175e98a5ea5', //7TV Subscriber (1 Year)
-	'6252f19002e3fc95c5dbf9ce', //7TV Translator
-	'62f99d0ce46eb00e438a6983', //7TV Translator
+	'01F8H53RZG000FJPFSJJHW714T', //7TV Admin
+	'01F8H55JK8000FJPFSJJHW714V', //7TV Dungeon Mistress
+	'01F8H56KSR000FJPFSJJHW714W', //7TV Moderator
+	'01F915ZNMR000B1B24Q19K3ZHB', //7TV Contributor
+	'01FEGX9TZR000E2A0BEAW5DD6M', //7TV Subscriber (Founder)
+	'01FNXQY7D00005RKDHEQMRMQN1', //7TV Subscriber (1 Month)
+	'01FNXR7R300005RKDHEQMRMQN2', //7TV Subscriber (3 Months)
+	'01FNXRJNPG0005RKDHEQMRMQN3', //7TV Subscriber (6 Months)
+	'01FNXRX9HG0005RKDHEQMRMQN4', //7TV Subscriber (9 Months)
+	'01FNXRZDX00005RKDHEQMRMQN5', //7TV Subscriber (1 Year)
+	'01G09ZZ6M000005RZWJQ2XQYEE', //7TV Translator
 ];
