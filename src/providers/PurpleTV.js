@@ -1,5 +1,5 @@
 export async function getBadges() {
-	const getBadges = await fetch(`${window.cors}https://api.nopbreak.ws/orange/donations`);
+	const getBadges = await fetch(`${window.cors}https://api.nopbreak.ru/orange/donations`);
 
 	if (!getBadges.ok) {
 		throw new Error();
