@@ -445,11 +445,18 @@ async function fetchUserData(userName) {
 		}
 
 		//7TV
-		const getStvUserCosmetics = await getCachedOrFetch(`7tvCosmetics:${userID}`, () => stv.getUserData(userID), 1);
-		const stvUserCosmetics = getStvUserCosmetics?.map((c) => c.id) || [];
+		const getStvUserCosmetics = await getCachedOrFetch(
+			`7tvCosmetics:${userID}`, 
+			async () => stv.getUserCosmetics(userID), 
+			1
+		);
 
-		const stvUserBadges = getStvUserCosmetics?.filter((b) => b.kind == 'BADGE') || [];
-		const stvUserPaints = getStvUserCosmetics?.filter((p) => p.kind == 'PAINT') || [];
+		const stvUserCosmetics = [].concat(
+			getStvUserCosmetics.badges.map((b) => b.id),
+			getStvUserCosmetics.paints.map((p) => p.id),
+		)
+		const stvUserBadges = getStvUserCosmetics.badges;
+		const stvUserPaints = getStvUserCosmetics.paints;
 
 		createBadgeElement(
 			'<i class="fa-solid fa-eye-slash"></i>',
@@ -464,15 +471,15 @@ async function fetchUserData(userName) {
 			const badgeImage = `https://cdn.7tv.app/badge/${badgeID}/3x`;
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='7TV Badge'>`,
-				badge.tooltip,
-				() => applyBadge(badgeImage, badge.tooltip, '7tv'),
+				badge.description,
+				() => applyBadge(badgeImage, badge.name, '7tv'),
 				'7tv',
 				stvUserCosmetics.includes(badgeID),
 			);
 
-			const getBadge = getStvUserCosmetics?.find((x) => x.id == badgeID);
+			const getBadge = getStvUserCosmetics?.badges?.find((x) => x.id == badgeID);
 			if (getBadge?.selected) {
-				applyBadge(badgeImage, badge.tooltip, '7tv');
+				applyBadge(badgeImage, badge.description, '7tv');
 			}
 		}
 
@@ -490,7 +497,7 @@ async function fetchUserData(userName) {
 			);
 			applyPaint(paintID, paint);
 
-			const getPaint = getStvUserCosmetics?.find((x) => x.id == paintID);
+			const getPaint = getStvUserCosmetics?.paints?.find((x) => x.id == paintID);
 			if (getPaint?.selected) {
 				paintSelected = true;
 				userLoaded.paint = paint;
@@ -1000,47 +1007,30 @@ function clearBadges(divName, platform) {
 	maxWidthVisualizer();
 }
 
-function applyPaint(ID, paint, selected) {
-	if (!paint) return;
+function applyPaint(elementId, paint, selected = false) {
+	if (!paint || !paint.id) {
+		return;
+	}
+
 	if (selected) {
 		clearSelectedPaint();
 		document.querySelectorAll(`[data-paint-id='${paint.id}']`).forEach((element) => {
 			element.parentNode.style.backgroundColor = '#454545';
 		});
 	}
-	document.querySelectorAll(`[data-paint-id='${ID}']`).forEach((editText) => {
-		if (paint.function === 'LINEAR_GRADIENT' && paint.stops && paint.stops.length) {
-			const gradientStops = paint.stops.map((stop) => {
-				const colorString = '#' + (stop.color >>> 0).toString(16).padStart(8, '0');
-				return `${colorString} ${stop.at * 100}%`;
-			});
-			const gradientDirection = `${paint.angle}deg`;
-			const gradient = paint.repeat
-				? `repeating-linear-gradient(${gradientDirection}, ${gradientStops.join(', ')})`
-				: `linear-gradient(${gradientDirection}, ${gradientStops.join(', ')})`;
-			editText.style.backgroundImage = gradient;
-		} else if (paint.function === 'RADIAL_GRADIENT' && paint.stops && paint.stops.length) {
-			const gradientStops = paint.stops.map((stop) => {
-				const colorString = '#' + (stop.color >>> 0).toString(16).padStart(8, '0');
-				return `${colorString} ${stop.at * 100}%`;
-			});
-			const gradient = paint.repeat
-				? `repeating-radial-gradient(circle, ${gradientStops.join(', ')})`
-				: `radial-gradient(circle, ${gradientStops.join(', ')})`;
-			editText.style.backgroundImage = gradient;
-		} else if (paint.function === 'URL' && paint.image_url) {
-			editText.style.backgroundImage = `url('${paint.image_url}')`;
-		}
 
-		if (paint.shadows && paint.shadows.length) {
-			const dropShadows = paint.shadows.map((shadow) => {
-				const colorString = '#' + (shadow.color >>> 0).toString(16).padStart(8, '0');
-				return `drop-shadow(${colorString} ${shadow.x_offset}px ${shadow.y_offset}px ${shadow.radius}px)`;
-			});
-			editText.style.filter = dropShadows.join(' ');
-		} else {
-			editText.style.filter = '';
-		}
+	document.querySelectorAll(`[data-paint-id='${elementId}']`).forEach((element) => {
+		const styleString = stv.computePaintStyle(paint);
+
+		styleString.split(';').forEach(part => {
+			const parts = part.split(':');
+			const prop = parts[0]?.trim();
+			const value = parts.slice(1).join(':').trim();
+		
+			if (prop && value) {
+				element.style.setProperty(prop, value);
+			}
+		});
 	});
 }
 
