@@ -191,22 +191,27 @@ export const getUserCosmetics = async (twitchId) => {
 	const activePaintId = data.style?.activePaint?.id;
 	const paints = [];
 	for (const paint of data.inventory.paints ?? []) {
-		if (paint.to.paint.id === activePaintId) {
+		if (paint.to.paint?.id === activePaintId) {
 			paint.to.paint.selected = true;
 		}
+
 		paints.push(paint.to.paint);
 	}
 	
 	const activeBadgeId = data.style?.activeBadge?.id;
 	const badges = [];
 	for (const badge of data.inventory?.badges ?? []) {
-		if (badge.to.badge.id === activeBadgeId) {
+		if (badge.to.badge?.id === activeBadgeId) {
 			badge.to.badge.selected = true;
 		}
+
 		badges.push(badge.to.badge);
 	}
 
-	return { paints, badges };
+	return {
+		paints: paints.filter(p => p !== null),
+		badges: badges.filter(b => b !== null)
+	};
 }
 
 export const getCosmetics = async () => {
@@ -214,7 +219,7 @@ export const getCosmetics = async () => {
 
 	return {
 		paints: cosmeticsData?.data?.paints?.paints ?? [],
-		badges: cosmeticsData?.data?.badges?.badges?.filter((b) => !removedBadges.includes(b.id)) ?? [],
+		badges: cosmeticsData?.data?.badges?.badges?.filter((b) => !removedBadges.includes(b?.id)) ?? [],
 	};
 };
 
