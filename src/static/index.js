@@ -451,10 +451,9 @@ async function fetchUserData(userName) {
 			1
 		);
 
-		const stvUserCosmetics = [].concat(
-			getStvUserCosmetics.badges.map((b) => b.id),
-			getStvUserCosmetics.paints.map((p) => p.id),
-		)
+		const alreadyApplyedPaints = new Set();
+		const alreadyApplyedBadges = new Set();
+
 		const stvUserBadges = getStvUserCosmetics.badges;
 		const stvUserPaints = getStvUserCosmetics.paints;
 
@@ -466,19 +465,27 @@ async function fetchUserData(userName) {
 			stvUserBadges.length,
 		);
 
-		for (const badge of stvCosmetics.badges) {
+		for (const badge of stvUserBadges) {
+			if (alreadyApplyedBadges.has(badge.id)) {
+				continue;
+			}
+
+			alreadyApplyedBadges.add(badge.id);
+
 			const badgeID = badge.id;
+
 			const badgeImage = `https://cdn.7tv.app/badge/${badgeID}/3x`;
+
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='7TV Badge'>`,
 				badge.description,
 				() => applyBadge(badgeImage, badge.name, '7tv'),
 				'7tv',
-				stvUserCosmetics.includes(badgeID),
+				true,
 			);
 
-			const getBadge = getStvUserCosmetics?.badges?.find((x) => x.id == badgeID);
-			if (getBadge?.selected) {
+			const isSelected = badge.selected;
+			if (isSelected) {
 				applyBadge(badgeImage, badge.description, '7tv');
 			}
 		}
@@ -486,21 +493,29 @@ async function fetchUserData(userName) {
 		createPaintElement('No 7TV Paint', 'var(--user-color)', clearPaint, 'noPaint', stvUserPaints.length);
 		let paintSelected = false;
 
-		for (const paint of stvCosmetics.paints) {
+		for (const paint of stvUserPaints) {
+			if (alreadyApplyedPaints.has(paint.id)) {
+				continue;
+			}
+
+			alreadyApplyedPaints.add(paint.id);
+
 			const paintID = paint.id;
 			createPaintElement(
 				paint.name,
 				'',
 				() => applyPaint('userName', paint, true),
 				paintID,
-				stvUserCosmetics.includes(paintID),
+				true,
 			);
+
 			applyPaint(paintID, paint);
 
-			const getPaint = getStvUserCosmetics?.paints?.find((x) => x.id == paintID);
-			if (getPaint?.selected) {
+			const isSelected = paint.selected;
+			if (isSelected) {
 				paintSelected = true;
 				userLoaded.paint = paint;
+
 				applyPaint('userName', paint, true);
 			}
 		}

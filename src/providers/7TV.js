@@ -115,24 +115,18 @@ const fullUserQuery = (id) => /* GraphQL */`{
 		userByConnection(platform: TWITCH, platformId: "${id}") {
 			id
 			style {
-				activePaint { id name }
-				activeBadge { id name }
+				activePaint ${fullPaintQueryFields} 
+				activeBadge ${fullBadgeQueryFields}
 			}
       inventory {
           paints {
               to {
-                paint {
-                    name
-                    id
-                }
+                paint ${fullPaintQueryFields}
               }
           }
           badges {
               to {
-                badge {
-                    name
-                    id
-                }
+                badge ${fullBadgeQueryFields}
               }
           }
       }
@@ -142,7 +136,7 @@ const fullUserQuery = (id) => /* GraphQL */`{
 
 // Remove newlines and extra spaces
 const cleanQuery = (query) => {
-	return query.replace(/\\n/g, '').replace(/\s+/g, ' '); 
+	return query.replace(/\\n/g, '').replace(/\s+/g, ' ');
 }
 
 const requestGql = async ({
@@ -157,11 +151,11 @@ const requestGql = async ({
 			headers: {'Content-Type': 'application/json'},
 			body: JSON.stringify({ operationName, variables, query: cleanQuery(query) }),
 		});
-	
+
 		if (!response.ok) {
 			return undefined;
 		}
-	
+
 		const data = await response.json();
 		if (data.errors || data.message) {
 			if (retryCount === 5) {
@@ -169,7 +163,7 @@ const requestGql = async ({
 
 				return undefined;
 			}
-	
+
 			await new Promise((r) => setTimeout(r, 500));
 			retryCount++;
 		}
@@ -187,7 +181,7 @@ export const getUserCosmetics = async (twitchId) => {
 		}
 	}
 	const data = userData.data.users.userByConnection;
-	
+
 	const activePaintId = data.style?.activePaint?.id;
 	const paints = [];
 	for (const paint of data.inventory.paints ?? []) {
@@ -197,7 +191,7 @@ export const getUserCosmetics = async (twitchId) => {
 
 		paints.push(paint.to.paint);
 	}
-	
+
 	const activeBadgeId = data.style?.activeBadge?.id;
 	const badges = [];
 	for (const badge of data.inventory?.badges ?? []) {
