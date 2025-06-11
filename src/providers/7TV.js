@@ -115,8 +115,8 @@ const fullUserQuery = (id) => /* GraphQL */`{
 		userByConnection(platform: TWITCH, platformId: "${id}") {
 			id
 			style {
-				activePaint ${fullPaintQueryFields} 
-				activeBadge ${fullBadgeQueryFields}
+				activePaint { id }
+				activeBadge { id description }
 			}
       inventory {
           paints {
@@ -180,6 +180,7 @@ export const getUserCosmetics = async (twitchId) => {
 			badges: [],
 		}
 	}
+
 	const data = userData.data.users.userByConnection;
 
 	const activePaintId = data.style?.activePaint?.id;
@@ -209,12 +210,7 @@ export const getUserCosmetics = async (twitchId) => {
 }
 
 export const getCosmetics = async () => {
-	const cosmeticsData = await requestGql({ query: fullCosmeticsQuery });
-
-	return {
-		paints: cosmeticsData?.data?.paints?.paints ?? [],
-		badges: cosmeticsData?.data?.badges?.badges?.filter((b) => !removedBadges.includes(b?.id)) ?? [],
-	};
+	return await getUserCosmetics('913105917');
 };
 
 const computeLinearGradientLayer = (layer, opacity) => {
