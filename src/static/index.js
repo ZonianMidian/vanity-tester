@@ -10,6 +10,7 @@ import * as chatty from '../providers/Chatty.js';
 import * as homies from '../providers/Homies.js';
 import * as stv from '../providers/7TV.js';
 import './main.css';
+import {fallback as stvcosmetics} from '../providers/Chatsen.js';
 
 let cosmeticsLoaded = false;
 let chatterinoIDs = [];
@@ -465,7 +466,7 @@ async function fetchUserData(userName) {
 			stvUserBadges.length,
 		);
 
-		for (const badge of stvUserBadges) {
+		for (const badge of stvCosmetics.badges) {
 			if (alreadyApplyedBadges.has(badge.id)) {
 				continue;
 			}
@@ -476,15 +477,17 @@ async function fetchUserData(userName) {
 
 			const badgeImage = `https://cdn.7tv.app/badge/${badgeID}/3x`;
 
+			const ownsBadge = stvUserBadges.find(b => b.id === badgeID);
+
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='7TV Badge'>`,
 				badge.description,
 				() => applyBadge(badgeImage, badge.name, '7tv'),
 				'7tv',
-				true,
+				!!ownsBadge,
 			);
 
-			const isSelected = badge.selected;
+			const isSelected = ownsBadge?.selected;
 			if (isSelected) {
 				applyBadge(badgeImage, badge.description, '7tv');
 			}
@@ -493,7 +496,7 @@ async function fetchUserData(userName) {
 		createPaintElement('No 7TV Paint', 'var(--user-color)', clearPaint, 'noPaint', stvUserPaints.length);
 		let paintSelected = false;
 
-		for (const paint of stvUserPaints) {
+		for (const paint of stvCosmetics.paints) {
 			if (alreadyApplyedPaints.has(paint.id)) {
 				continue;
 			}
@@ -501,17 +504,20 @@ async function fetchUserData(userName) {
 			alreadyApplyedPaints.add(paint.id);
 
 			const paintID = paint.id;
+
+			const ownsPaint = stvUserPaints.find(p => p.id === paintID);
+
 			createPaintElement(
 				paint.name,
 				'',
 				() => applyPaint('userName', paint, true),
 				paintID,
-				true,
+				!!ownsPaint,
 			);
 
 			applyPaint(paintID, paint);
 
-			const isSelected = paint.selected;
+			const isSelected = ownsPaint?.selected;
 			if (isSelected) {
 				paintSelected = true;
 				userLoaded.paint = paint;
