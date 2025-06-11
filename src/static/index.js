@@ -10,7 +10,6 @@ import * as chatty from '../providers/Chatty.js';
 import * as homies from '../providers/Homies.js';
 import * as stv from '../providers/7TV.js';
 import './main.css';
-import {fallback as stvcosmetics} from '../providers/Chatsen.js';
 
 let cosmeticsLoaded = false;
 let chatterinoIDs = [];
