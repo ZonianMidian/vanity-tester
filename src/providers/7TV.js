@@ -187,9 +187,10 @@ export const getUserCosmetics = async (twitchId) => {
 	const data = userData.data.users.userByConnection;
 
 	const activePaintId = data.style?.activePaint?.id;
+
 	const paints = [];
 	for (const paint of data.inventory.paints ?? []) {
-		if (paint.to.paint?.id === activePaintId) {
+		if (paint.to?.paint.id === activePaintId) {
 			paint.to.paint.selected = true;
 		}
 
@@ -197,10 +198,14 @@ export const getUserCosmetics = async (twitchId) => {
 	}
 
 	const activeBadgeId = data.style?.activeBadge?.id;
+
 	const badges = [];
 	for (const badge of data.inventory?.badges ?? []) {
-		if (badge.to.badge?.id === activeBadgeId) {
-			badge.to.badge.selected = true;
+		const badgeData = badge.to.badge || null;
+		if (!badgeData) continue;
+
+		if (badgeData?.id === activeBadgeId) {
+			badgeData.selected = true;
 		}
 
 		badges.push(badge.to.badge);
