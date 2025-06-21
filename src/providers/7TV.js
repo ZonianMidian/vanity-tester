@@ -14,33 +14,63 @@ const removedBadges = [
 	'01G09ZZ6M000005RZWJQ2XQYEE', //7TV Translator
 ];
 
-const fullPaintQueryFields = /* GraphQL */`{
-	id
-	name
-	description
-	data {
-		layers {
-			id
-			ty {
-				... on PaintLayerTypeImage {
-					__typename
-					images {
+const fullPaintQueryFields = /* GraphQL */ `
+	{
+		id
+		name
+		description
+		data {
+			layers {
+				id
+				ty {
+					... on PaintLayerTypeImage {
 						__typename
-						url
-						mime
-						size
-						scale
-						width
-						height
-						frameCount
+						images {
+							__typename
+							url
+							mime
+							size
+							scale
+							width
+							height
+							frameCount
+						}
 					}
-				}
-				... on PaintLayerTypeRadialGradient {
-					__typename
-					repeating
-					shape
-					stops {
-						at
+					... on PaintLayerTypeRadialGradient {
+						__typename
+						repeating
+						shape
+						stops {
+							at
+							color {
+								__typename
+								hex
+								r
+								g
+								b
+								a
+							}
+						}
+					}
+					... on PaintLayerTypeLinearGradient {
+						__typename
+						angle
+						repeating
+						stops {
+							__typename
+							at
+							color {
+								__typename
+								hex
+								r
+								g
+								b
+								a
+							}
+						}
+					}
+					... on PaintLayerTypeSingleColor {
+						__typename
 						color {
 							__typename
 							hex
@@ -51,66 +81,40 @@ const fullPaintQueryFields = /* GraphQL */`{
 						}
 					}
 				}
-				... on PaintLayerTypeLinearGradient {
-					__typename
-					angle
-					repeating
-					stops {
-						__typename
-						at
-						color {
-							__typename
-							hex
-							r
-							g
-							b
-							a
-						}
-					}
-				}
-				... on PaintLayerTypeSingleColor {
-					__typename
-					color {
-						__typename
-						hex
-						r
-						g
-						b
-						a
-					}
-				}
+				opacity
 			}
-			opacity
-		}
-		shadows {
-			__typename
-			offsetX
-			offsetY
-			blur
-			color {
+			shadows {
 				__typename
-				hex
-				r
-				g
-				b
-				a
+				offsetX
+				offsetY
+				blur
+				color {
+					__typename
+					hex
+					r
+					g
+					b
+					a
+				}
 			}
 		}
 	}
-}`;
+`;
 
-const fullBadgeQueryFields = /* GraphQL */`{
-	id
-	name
-	description
-}`;
+const fullBadgeQueryFields = /* GraphQL */ `
+	{
+		id
+		name
+		description
+	}
+`;
 
-const fullCosmeticsQuery = /* GraphQL */`{ 
+const fullCosmeticsQuery = /* GraphQL */ `{ 
 	paints { paints ${fullPaintQueryFields} } 
 	badges { badges ${fullBadgeQueryFields} } 
-}`
+}`;
 
-const fullUserQuery = (id) => /* GraphQL */`{ 
+const fullUserQuery = (id) => /* GraphQL */ `{ 
 	users {
 		userByConnection(platform: TWITCH, platformId: "${id}") {
 			id
@@ -132,23 +136,19 @@ const fullUserQuery = (id) => /* GraphQL */`{
       }
 		}
 	}
-}`
+}`;
 
 // Remove newlines and extra spaces
 const cleanQuery = (query) => {
 	return query.replace(/\\n/g, '').replace(/\s+/g, ' ');
-}
+};
 
-const requestGql = async ({
-	query,
-	variables = {},
-	operationName,
-}) => {
+const requestGql = async ({ query, variables = {}, operationName }) => {
 	let retryCount = 0;
 	while (retryCount <= 5) {
 		const response = await fetch('https://7tv.io/v4/gql', {
 			method: 'POST',
-			headers: {'Content-Type': 'application/json'},
+			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ operationName, variables, query: cleanQuery(query) }),
 		});
 
@@ -159,7 +159,10 @@ const requestGql = async ({
 		const data = await response.json();
 		if (data.errors || data.message) {
 			if (retryCount === 5) {
-				console.error('Error fetching user 7TV cosmetics:', userCosmeticsData.errors || userCosmeticsData.message);
+				console.error(
+					'Error fetching user 7TV cosmetics:',
+					userCosmeticsData.errors || userCosmeticsData.message,
+				);
 
 				return undefined;
 			}
@@ -170,15 +173,15 @@ const requestGql = async ({
 
 		return data;
 	}
-}
+};
 
 export const getUserCosmetics = async (twitchId) => {
-	const userData = await requestGql({ query: fullUserQuery(twitchId) })
+	const userData = await requestGql({ query: fullUserQuery(twitchId) });
 	if (!userData?.data?.users?.userByConnection) {
 		return {
 			paints: [],
 			badges: [],
-		}
+		};
 	}
 
 	const data = userData.data.users.userByConnection;
@@ -204,49 +207,47 @@ export const getUserCosmetics = async (twitchId) => {
 	}
 
 	return {
-		paints: paints.filter(p => p !== null),
-		badges: badges.filter(b => b !== null)
+		paints: paints.filter((p) => p !== null),
+		badges: badges.filter((b) => b !== null),
 	};
-}
+};
 
 export const getCosmetics = async () => {
 	return await getUserCosmetics('913105917');
 };
 
 const computeLinearGradientLayer = (layer, opacity) => {
-  if (layer.stops.length === 0) {
-    return undefined;
-  }
+	if (layer.stops.length === 0) {
+		return undefined;
+	}
 
-  const prefix = layer.repeating ? 'repeating-' : '';
-  const stops = layer.stops.map((stop) => `${stop.color.hex} ${stop.at * 100}%`).join(', ');
-  const gradient = `${prefix}linear-gradient(${layer.angle}deg, ${stops})`;
-  return {
-    opacity,
-    image: gradient,
-  };
+	const prefix = layer.repeating ? 'repeating-' : '';
+	const stops = layer.stops.map((stop) => `${stop.color.hex} ${stop.at * 100}%`).join(', ');
+	const gradient = `${prefix}linear-gradient(${layer.angle}deg, ${stops})`;
+	return {
+		opacity,
+		image: gradient,
+	};
 };
 
 const computeRadialGradientLayer = (layer, opacity) => {
-  if (layer.stops.length === 0) {
-    return undefined;
-  }
+	if (layer.stops.length === 0) {
+		return undefined;
+	}
 
-  const prefix = layer.repeating ? 'repeating-' : '';
-  const shape = layer.shape === 'CIRCLE' ? 'circle' : 'ellipse';
-  const stops = layer.stops.map((stop) => `${stop.color.hex} ${stop.at * 100}%`).join(', ');
-  const gradient = `${prefix}radial-gradient(${shape}, ${stops})`;
-  return {
-    opacity,
-    image: gradient,
-  };
+	const prefix = layer.repeating ? 'repeating-' : '';
+	const shape = layer.shape === 'CIRCLE' ? 'circle' : 'ellipse';
+	const stops = layer.stops.map((stop) => `${stop.color.hex} ${stop.at * 100}%`).join(', ');
+	const gradient = `${prefix}radial-gradient(${shape}, ${stops})`;
+	return {
+		opacity,
+		image: gradient,
+	};
 };
 
 const computeImageLayer = (layer, opacity) => {
 	const isAnimated = layer.images.some((img) => img.frameCount > 1);
-	const img = layer.images.find(
-		(i) => i.scale === 1 && (isAnimated ? i.frameCount > 1 : true),
-	);
+	const img = layer.images.find((i) => i.scale === 1 && (isAnimated ? i.frameCount > 1 : true));
 
 	if (!img) {
 		return undefined;
@@ -258,66 +259,65 @@ const computeImageLayer = (layer, opacity) => {
 	};
 };
 
-
 const computeSingleColorLayer = (layer, opacity) => {
-  return {
-    opacity,
-    color: layer.color.hex,
-  };
+	return {
+		opacity,
+		color: layer.color.hex,
+	};
 };
 
 const computeDropShadows = (shadows) => {
-  if (shadows.length === 0) {
-    return undefined;
-  }
+	if (shadows.length === 0) {
+		return undefined;
+	}
 
-  return shadows
-    .map((s) => `drop-shadow(${s.color.hex} ${s.offsetX}px ${s.offsetY}px ${s.blur}px)`)
-    .join(' ');
+	return shadows.map((s) => `drop-shadow(${s.color.hex} ${s.offsetX}px ${s.offsetY}px ${s.blur}px)`).join(' ');
 };
 
 export const computePaintStyle = (paint) => {
-  const layers = paint.data.layers.map((layer) => {
-    switch (layer.ty.__typename) {
-      case 'PaintLayerTypeLinearGradient':
-        return computeLinearGradientLayer(layer.ty, layer.opacity);
-      case 'PaintLayerTypeRadialGradient':
-        return computeRadialGradientLayer(layer.ty, layer.opacity);
-      case 'PaintLayerTypeImage':
-        return computeImageLayer(layer.ty, layer.opacity);
-      case 'PaintLayerTypeSingleColor':
-        return computeSingleColorLayer(layer.ty, layer.opacity);
-      default:
-        return undefined;
-    }
-  }).filter((l) => l !== undefined);
+	const layers = paint.data.layers
+		.map((layer) => {
+			switch (layer.ty.__typename) {
+				case 'PaintLayerTypeLinearGradient':
+					return computeLinearGradientLayer(layer.ty, layer.opacity);
+				case 'PaintLayerTypeRadialGradient':
+					return computeRadialGradientLayer(layer.ty, layer.opacity);
+				case 'PaintLayerTypeImage':
+					return computeImageLayer(layer.ty, layer.opacity);
+				case 'PaintLayerTypeSingleColor':
+					return computeSingleColorLayer(layer.ty, layer.opacity);
+				default:
+					return undefined;
+			}
+		})
+		.filter((l) => l !== undefined);
 
-  const styleParts = [];
+	const styleParts = [];
 
-  const backgroundImages = layers.flatMap((l) => l.image ? [l.image] : []);
-  const backgroundColors = layers.flatMap((l) => l.color ? [l.color] : []);
-  const background = [...backgroundColors, ...backgroundImages].join(', ');
-  if (background.trim().length > 0) {
-    styleParts.push(`background: ${background};`);
-  }
+	const backgroundImages = layers.flatMap((l) => (l.image ? [l.image] : []));
+	const backgroundColors = layers.flatMap((l) => (l.color ? [l.color] : []));
+	const background = [...backgroundColors, ...backgroundImages].join(', ');
+	if (background.trim().length > 0) {
+		styleParts.push(`background: ${background};`);
+	}
 
-  styleParts.push(
-    `-webkit-background-clip: text;`,
-    `background-clip: text;`,
-    `background-size: cover;`,
-    `background-position: center;`,
-    `color: transparent;`,
-  );
+	styleParts.push(
+		`-webkit-background-clip: text;`,
+		`background-clip: text;`,
+		`background-size: cover;`,
+		`background-position: center;`,
+		`color: transparent;`,
+	);
 
-  const filter = computeDropShadows(paint.data.shadows);
-  if (filter !== undefined) {
-    styleParts.push(`filter: ${filter};`);
-  }
+	const filter = computeDropShadows(paint.data.shadows);
+	if (filter !== undefined) {
+		styleParts.push(`filter: ${filter};`);
+	}
 
-  const opacities = layers.map((l) => l.opacity).filter((o) => o < 1);
-  if (opacities.length > 0) {
-    styleParts.push(`opacity: ${Math.min(...opacities)};`);
-  }
+	const opacities = layers.map((l) => l.opacity).filter((o) => o < 1);
+	if (opacities.length > 0) {
+		styleParts.push(`opacity: ${Math.min(...opacities)};`);
+	}
 
-  return styleParts.join(' ');
+	return styleParts.join(' ');
 };

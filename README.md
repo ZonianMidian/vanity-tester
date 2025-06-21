@@ -12,7 +12,7 @@ You can create a [GitHub Issue](https://github.com/ZonianMidian/vanity-tester/is
 
 ## Installation
 
--   `git clone https://github.com/ZonianMidian/vanity-tester.git`
--   `cd vanity-tester`
--   `npm install`
--   `npm run build`
+- `git clone https://github.com/ZonianMidian/vanity-tester.git`
+- `cd vanity-tester`
+- `npm install`
+- `npm run build`

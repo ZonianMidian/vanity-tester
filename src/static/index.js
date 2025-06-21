@@ -50,8 +50,8 @@ async function fetchData() {
 		getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24),
 		getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24),
 		getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24),
-		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24)
-	]).then(res => res.map((result) => result.value));
+		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24),
+	]).then((res) => res.map((result) => result.value));
 
 	[
 		purpletvBadges,
@@ -448,7 +448,7 @@ async function fetchUserData(userName) {
 		const getStvUserCosmetics = await getCachedOrFetch(
 			`7tvCosmetics:${userID}`,
 			async () => stv.getUserCosmetics(userID),
-			1
+			1,
 		);
 
 		const alreadyApplyedPaints = new Set();
@@ -476,7 +476,7 @@ async function fetchUserData(userName) {
 
 			const badgeImage = `https://cdn.7tv.app/badge/${badgeID}/3x`;
 
-			const ownsBadge = stvUserBadges.find(b => b.id === badgeID);
+			const ownsBadge = stvUserBadges.find((b) => b.id === badgeID);
 
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='7TV Badge'>`,
@@ -504,15 +504,9 @@ async function fetchUserData(userName) {
 
 			const paintID = paint.id;
 
-			const ownsPaint = stvUserPaints.find(p => p.id === paintID);
+			const ownsPaint = stvUserPaints.find((p) => p.id === paintID);
 
-			createPaintElement(
-				paint.name,
-				'',
-				() => applyPaint('userName', paint, true),
-				paintID,
-				!!ownsPaint,
-			);
+			createPaintElement(paint.name, '', () => applyPaint('userName', paint, true), paintID, !!ownsPaint);
 
 			applyPaint(paintID, paint);
 
@@ -568,7 +562,7 @@ async function fetchUserData(userName) {
 		const homiesBadge = homiesCustomBadges.find((b) => b.userId == userID);
 		if (homiesBadge) {
 			const badgeName = `Homies ${displayName} Badge`;
-			const badgeImage = `https://chatterinohomies.com/api/badges/${homiesBadge.badgeId}?size=3x`
+			const badgeImage = `https://chatterinohomies.com/api/badges/${homiesBadge.badgeId}?size=3x`;
 
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='Homies Badge'>`,
@@ -612,9 +606,7 @@ async function fetchUserData(userName) {
 			const customBadge = user.badgeUrl.length;
 			const devBadge = user.userId == '157861306';
 			const userHasBadge = user.userId == String(userID);
-			const userBadge = user.badgeUrl.length
-				? user.badgeUrl
-				: purpletvBadges.defaultBadgeUrl;
+			const userBadge = user.badgeUrl.length ? user.badgeUrl : purpletvBadges.defaultBadgeUrl;
 			const badgeTile = devBadge
 				? 'PurpleTV Developer'
 				: customBadge
@@ -1043,7 +1035,7 @@ function applyPaint(elementId, paint, selected = false) {
 	document.querySelectorAll(`[data-paint-id='${elementId}']`).forEach((element) => {
 		const styleString = stv.computePaintStyle(paint);
 
-		styleString.split(';').forEach(part => {
+		styleString.split(';').forEach((part) => {
 			const parts = part.split(':');
 			const prop = parts[0]?.trim();
 			const value = parts.slice(1).join(':').trim();
@@ -1177,7 +1169,7 @@ function loadingCircle() {
 function sendStats(name, data) {
 	if (window.umami) {
 		window.umami.track(name, data ?? {});
-	};
+	}
 }
 
 const firstSize = '70px';
@@ -1300,8 +1292,8 @@ window.handleTextChange = function (element) {
 		});
 
 		sendStats('vanity', {
-			user: newText?.toLowerCase()
-		})
+			user: newText?.toLowerCase(),
+		});
 	}, 2000);
 };
 
@@ -1309,8 +1301,8 @@ window.toggleFFZBadges = function () {
 	const checkbox = document.getElementById(`check-ffzbadges`);
 	const displayValue = checkbox.checked;
 	sendStats('toggle-ffz-custom', {
-		value: displayValue
-	})
+		value: displayValue,
+	});
 
 	if (displayValue) {
 		handleCustomBadges(ffzCustomBadges.mod, ffzCustomBadges.vip);
@@ -1349,8 +1341,8 @@ window.toggleSection = function (sectionId) {
 	}
 
 	sendStats(`button-${sectionId}`, {
-		value
-	})
+		value,
+	});
 };
 
 window.toggleMode = function () {
@@ -1381,8 +1373,8 @@ window.toggleMode = function () {
 	}
 
 	sendStats('vanity-mode', {
-		mode: button.textContent
-	})
+		mode: button.textContent,
+	});
 };
 
 window.createBadgeElement = function (badgeImage, badgeName, onClickHandler, platform, userHasBadge, allRemoved) {
@@ -1474,8 +1466,8 @@ window.changeLinkAndTitle = function (channel) {
 window.handleColorChange = function (value) {
 	value = value?.toUpperCase() || '#FFFFFF';
 	sendStats('vanity-color', {
-		color: value
-	})
+		color: value,
+	});
 
 	document.documentElement.style.setProperty('--user-color', value);
 	document.getElementById('editText').style.backgroundColor = value;
@@ -1529,8 +1521,8 @@ window.handleChannelChange = function (value) {
 		fetchChannelData(value);
 
 		sendStats('vanity', {
-			channel: value?.toLowerCase()
-		})
+			channel: value?.toLowerCase(),
+		});
 	}, 2000);
 };
 
@@ -1538,8 +1530,8 @@ window.toggleProvider = function (providerId) {
 	const checkbox = document.getElementById(`check-${providerId}`);
 	const isCheckboxChecked = checkbox.checked;
 	sendStats(`provider-${providerId}`, {
-		value: isCheckboxChecked
-	})
+		value: isCheckboxChecked,
+	});
 
 	const platformElements = document.querySelectorAll(`.platform-${providerId}`);
 	platformElements.forEach((element) => {
@@ -1656,8 +1648,8 @@ window.filterItems = function (value) {
 	timeoutId_search = setTimeout(() => {
 		if (searchField.length) {
 			sendStats('search', {
-				value: searchField
-			})
+				value: searchField,
+			});
 		}
 	}, 2000);
 };
@@ -1737,8 +1729,8 @@ window.onload = async function () {
 
 	sendStats('load-link', {
 		user: userName?.toLowerCase() ?? '',
-		channel: channelName?.toLowerCase() ?? ''
-	})
+		channel: channelName?.toLowerCase() ?? '',
+	});
 };
 
 window.cors = 'https://api.spanix.team/proxy/';
