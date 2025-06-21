@@ -1,6 +1,10 @@
 export async function getCustomBadges() {
-	const getBadges = await fetch(`${window.cors}https://chatterinohomies.com/api/badges/list`);
-	return (await getBadges.json()).badges;
+	const response = await fetch(`${window.cors}https://chatterinohomies.com/api/badges/list`);
+	const data = await response.json();
+	return data.badges.map(badge => ({
+		userId: badge.userId,
+		badgeId: badge.badgeId
+	}));
 }
 
 export async function getBadges() {

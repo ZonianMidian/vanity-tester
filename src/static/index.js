@@ -446,8 +446,8 @@ async function fetchUserData(userName) {
 
 		//7TV
 		const getStvUserCosmetics = await getCachedOrFetch(
-			`7tvCosmetics:${userID}`, 
-			async () => stv.getUserCosmetics(userID), 
+			`7tvCosmetics:${userID}`,
+			async () => stv.getUserCosmetics(userID),
 			1
 		);
 
@@ -568,17 +568,18 @@ async function fetchUserData(userName) {
 		const homiesBadge = homiesCustomBadges.find((b) => b.userId == userID);
 		if (homiesBadge) {
 			const badgeName = `Homies ${displayName} Badge`;
+			const badgeImage = `https://chatterinohomies.com/api/badges/${homiesBadge.badgeId}?size=3x`
 
 			createBadgeElement(
-				`<img src='${homiesBadge.image3}' alt='Homies Badge'>`,
+				`<img src='${badgeImage}' alt='Homies Badge'>`,
 				badgeName,
-				() => applyBadge(homiesBadge.image3, badgeName, 'homies', null, 'user'),
+				() => applyBadge(badgeImage, badgeName, 'homies', null, 'user'),
 				'homies',
 				true,
 				true,
 			);
 
-			applyBadge(homiesBadge.image3, badgeName, 'homies', null, 'user');
+			applyBadge(badgeImage, badgeName, 'homies', null, 'user');
 		}
 
 		for (const badge of homiesBadges) {
@@ -1046,7 +1047,7 @@ function applyPaint(elementId, paint, selected = false) {
 			const parts = part.split(':');
 			const prop = parts[0]?.trim();
 			const value = parts.slice(1).join(':').trim();
-		
+
 			if (prop && value) {
 				element.style.setProperty(prop, value);
 			}
