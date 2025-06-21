@@ -9,5 +9,5 @@ export const helpers = {
 	36442149: 'FFZ:AP Helper', // mieDax
 	29519423: 'FFZ:AP Helper', // Quanto
 	22025290: 'FFZ:AP Helper', // trihex
-	4867723: 'FFZ:AP Helper', // Wolsk
+	4867723: 'FFZ:AP Helper' // Wolsk
 };

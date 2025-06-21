@@ -4,7 +4,8 @@
 		<script
 			defer
 			src="https://umami.supa.codes/script.js"
-			data-website-id="fd24c4f5-8d63-4237-9e2f-fc682a0cc683"></script>
+			data-website-id="fd24c4f5-8d63-4237-9e2f-fc682a0cc683"
+		></script>
 		<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
 		<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/mdbassit/Coloris@latest/dist/coloris.min.css" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0" />
@@ -30,7 +31,8 @@
 					id="search-button"
 					data-umami-event="button-search"
 					onclick="showSearchField()"
-					style="display: none">
+					style="display: none"
+				>
 					<i class="fa fa-search"></i>
 				</button>
 				<input type="text" id="search-field" placeholder="Search..." oninput="filterItems(this.value)" />
@@ -57,7 +59,8 @@
 					class="red-button"
 					id="clear-cache"
 					data-umami-event="button-cache"
-					onclick="clearStorage(true)">
+					onclick="clearStorage(true)"
+				>
 					Clear Cache
 				</button>
 			</div>
@@ -70,7 +73,8 @@
 						id="displayName"
 						oninput="handleDisplayTextChange(this.value)"
 						maxlength="25"
-						required />
+						required
+					/>
 				</div>
 			</div>
 			<div class="menu-section">
@@ -89,7 +93,8 @@
 						oninput="handleChannelChange(this.value)"
 						maxlength="25"
 						required
-						disabled />
+						disabled
+					/>
 				</div>
 			</div>
 			<div class="menu-section">
@@ -107,7 +112,8 @@
 							id="check-twitch"
 							onclick="toggleProvider('twitch')"
 							checked
-							disabled />Twitch</label
+							disabled
+						/>Twitch</label
 					>
 					<label
 						><input
@@ -115,7 +121,8 @@
 							id="check-bttv"
 							onclick="toggleProvider('bttv')"
 							checked
-							disabled />BetterTTV</label
+							disabled
+						/>BetterTTV</label
 					>
 					<label
 						><input
@@ -123,7 +130,8 @@
 							id="check-ffz"
 							onclick="toggleProvider('ffz')"
 							checked
-							disabled />FrankerFaceZ</label
+							disabled
+						/>FrankerFaceZ</label
 					>
 					<label
 						><input
@@ -131,7 +139,8 @@
 							id="check-ffzap"
 							onclick="toggleProvider('ffzap')"
 							checked
-							disabled />FrankerFaceZ: AP</label
+							disabled
+						/>FrankerFaceZ: AP</label
 					>
 					<label
 						><input
@@ -139,7 +148,8 @@
 							id="check-chatterino"
 							onclick="toggleProvider('chatterino')"
 							checked
-							disabled />Chatterino</label
+							disabled
+						/>Chatterino</label
 					>
 					<label
 						><input
@@ -147,7 +157,8 @@
 							id="check-dankchat"
 							onclick="toggleProvider('dankchat')"
 							checked
-							disabled />DankChat</label
+							disabled
+						/>DankChat</label
 					>
 					<label
 						><input
@@ -155,7 +166,8 @@
 							id="check-chatty"
 							onclick="toggleProvider('chatty')"
 							checked
-							disabled />Chatty</label
+							disabled
+						/>Chatty</label
 					>
 					<label
 						><input
@@ -163,7 +175,8 @@
 							id="check-7tv"
 							onclick="toggleProvider('7tv')"
 							checked
-							disabled />7TV</label
+							disabled
+						/>7TV</label
 					>
 					<label
 						><input
@@ -171,7 +184,8 @@
 							id="check-chatsen"
 							onclick="toggleProvider('chatsen')"
 							checked
-							disabled />Chatsen</label
+							disabled
+						/>Chatsen</label
 					>
 					<label
 						><input
@@ -179,7 +193,8 @@
 							id="check-homies"
 							onclick="toggleProvider('homies')"
 							checked
-							disabled />Homies</label
+							disabled
+						/>Homies</label
 					>
 					<label
 						><input
@@ -187,7 +202,8 @@
 							id="check-purpletv"
 							onclick="toggleProvider('purpletv')"
 							checked
-							disabled />PurpleTV</label
+							disabled
+						/>PurpleTV</label
 					>
 				</div>
 			</div>
@@ -227,7 +243,8 @@
 					oninput="adjustInputWidth()"
 					maxlength="25"
 					style="background-color: var(--user-color); display: none; font-size: 70px"
-					data-paint-id="userName" />
+					data-paint-id="userName"
+				/>
 			</div>
 		</div>
 		<div id="user-arrow" style="opacity: 0.5; margin-top: 5rem">
@@ -302,8 +319,8 @@
 				'#1E90FF',
 				'#FF69B4',
 				'#8A2BE2',
-				'#00FF7F',
-			],
+				'#00FF7F'
+			]
 		});
 	</script>
 </html>

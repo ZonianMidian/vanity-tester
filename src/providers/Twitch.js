@@ -38,7 +38,7 @@ export async function getUserBadges(channelID, channelName, userName, filter) {
 		method: 'POST',
 		headers: {
 			'Accept-Language': 'en-US',
-			'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko',
+			'Client-ID': 'kimne78kx3ncx6brgo4mv6wki5h1ko'
 		},
 		body: `[
             {
@@ -58,7 +58,7 @@ export async function getUserBadges(channelID, channelName, userName, filter) {
                   }
                }
             }
-        ]`,
+        ]`
 	});
 
 	const badgesData = (await getUserBadges.json())[0]?.data;
@@ -78,10 +78,10 @@ export const filteredBadges = [
 	'founder',
 	'moments',
 	'bits',
-	'vip',
+	'vip'
 ];
 
 export const fallback = {
 	displayBadges: [],
-	earnedBadges: [],
+	earnedBadges: []
 };

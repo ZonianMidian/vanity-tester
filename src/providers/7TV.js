@@ -11,7 +11,7 @@ const removedBadges = [
 	'01FNXRJNPG0005RKDHEQMRMQN3', //7TV Subscriber (6 Months)
 	'01FNXRX9HG0005RKDHEQMRMQN4', //7TV Subscriber (9 Months)
 	'01FNXRZDX00005RKDHEQMRMQN5', //7TV Subscriber (1 Year)
-	'01G09ZZ6M000005RZWJQ2XQYEE', //7TV Translator
+	'01G09ZZ6M000005RZWJQ2XQYEE' //7TV Translator
 ];
 
 const fullPaintQueryFields = /* GraphQL */ `
@@ -149,7 +149,7 @@ const requestGql = async ({ query, variables = {}, operationName }) => {
 		const response = await fetch('https://7tv.io/v4/gql', {
 			method: 'POST',
 			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ operationName, variables, query: cleanQuery(query) }),
+			body: JSON.stringify({ operationName, variables, query: cleanQuery(query) })
 		});
 
 		if (!response.ok) {
@@ -161,7 +161,7 @@ const requestGql = async ({ query, variables = {}, operationName }) => {
 			if (retryCount === 5) {
 				console.error(
 					'Error fetching user 7TV cosmetics:',
-					userCosmeticsData.errors || userCosmeticsData.message,
+					userCosmeticsData.errors || userCosmeticsData.message
 				);
 
 				return undefined;
@@ -180,7 +180,7 @@ export const getUserCosmetics = async (twitchId) => {
 	if (!userData?.data?.users?.userByConnection) {
 		return {
 			paints: [],
-			badges: [],
+			badges: []
 		};
 	}
 
@@ -208,7 +208,7 @@ export const getUserCosmetics = async (twitchId) => {
 
 	return {
 		paints: paints.filter((p) => p !== null),
-		badges: badges.filter((b) => b !== null),
+		badges: badges.filter((b) => b !== null)
 	};
 };
 
@@ -226,7 +226,7 @@ const computeLinearGradientLayer = (layer, opacity) => {
 	const gradient = `${prefix}linear-gradient(${layer.angle}deg, ${stops})`;
 	return {
 		opacity,
-		image: gradient,
+		image: gradient
 	};
 };
 
@@ -241,7 +241,7 @@ const computeRadialGradientLayer = (layer, opacity) => {
 	const gradient = `${prefix}radial-gradient(${shape}, ${stops})`;
 	return {
 		opacity,
-		image: gradient,
+		image: gradient
 	};
 };
 
@@ -255,14 +255,14 @@ const computeImageLayer = (layer, opacity) => {
 
 	return {
 		opacity,
-		image: `url("${img.url}")`,
+		image: `url("${img.url}")`
 	};
 };
 
 const computeSingleColorLayer = (layer, opacity) => {
 	return {
 		opacity,
-		color: layer.color.hex,
+		color: layer.color.hex
 	};
 };
 
@@ -306,7 +306,7 @@ export const computePaintStyle = (paint) => {
 		`background-clip: text;`,
 		`background-size: cover;`,
 		`background-position: center;`,
-		`color: transparent;`,
+		`color: transparent;`
 	);
 
 	const filter = computeDropShadows(paint.data.shadows);

@@ -50,7 +50,7 @@ async function fetchData() {
 		getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24),
 		getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24),
 		getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24),
-		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24),
+		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24)
 	]).then((res) => res.map((result) => result.value));
 
 	[
@@ -65,7 +65,7 @@ async function fetchData() {
 		stvCosmetics,
 		twitchBadges,
 		ffzapBadges,
-		bttvData,
+		bttvData
 	] = results;
 
 	//PurpleTV
@@ -145,7 +145,7 @@ let userLoaded = {
 	userID: '',
 	tBadges: false,
 	tBadge: [],
-	sBadge: [],
+	sBadge: []
 };
 
 async function fetchUserData(userName) {
@@ -165,14 +165,14 @@ async function fetchUserData(userName) {
 			ffzBadges: false,
 			tBadges: false,
 			tBadge: [],
-			sBadge: [],
+			sBadge: []
 		};
 
 		//User Info
 		const userData = await getCachedOrFetch(
 			`twitchUser:${userName.toLocaleLowerCase()}`,
 			() => twitch.getUserData(userName),
-			1,
+			1
 		);
 		if (!userData.length) {
 			document.getElementById('rotating-circle').style.display = 'none';
@@ -196,7 +196,7 @@ async function fetchUserData(userName) {
 			`twitchUserBadges:${userID}`,
 			() => twitch.getUserBadges(userID, displayName),
 			1,
-			twitch.fallback,
+			twitch.fallback
 		);
 		earnedBadges = earnedBadges?.filter((b) => !twitch.filteredBadges.includes(b.setID)) ?? [];
 
@@ -211,7 +211,7 @@ async function fetchUserData(userName) {
 			'No Twitch Badge',
 			() => clearBadges('twitch'),
 			'twitch-base',
-			earnedBadges.length,
+			earnedBadges.length
 		);
 
 		for (const badge of twitchBadges) {
@@ -239,7 +239,7 @@ async function fetchUserData(userName) {
 					version.title,
 					() => applyBadge(version.image_url_4x, version.title, 'twitch', null, badge.set_id),
 					'twitch-base',
-					userHasBadge,
+					userHasBadge
 				);
 
 				if (badge.set_id == userBadge.setID && version.id == userBadge.version) {
@@ -249,7 +249,7 @@ async function fetchUserData(userName) {
 						userLoaded.tBadge[1],
 						userLoaded.tBadge[2],
 						userLoaded.tBadge[3],
-						userLoaded.tBadge[4],
+						userLoaded.tBadge[4]
 					);
 				} else if (badge.set_id == 'staff' && staff) {
 					userLoaded.sBadge = [version.image_url_4x, version.title, 'twitch', null, badge.set_id];
@@ -258,7 +258,7 @@ async function fetchUserData(userName) {
 						userLoaded.sBadge[1],
 						userLoaded.sBadge[2],
 						userLoaded.sBadge[3],
-						userLoaded.sBadge[4],
+						userLoaded.sBadge[4]
 					);
 				}
 			}
@@ -270,7 +270,7 @@ async function fetchUserData(userName) {
 			'No BTTV Badge',
 			() => clearBadges('bttv'),
 			'bttv',
-			bttvData.filter((u) => u.providerId == userID).length,
+			bttvData.filter((u) => u.providerId == userID).length
 		);
 
 		for (const badge of bttvBadges) {
@@ -281,7 +281,7 @@ async function fetchUserData(userName) {
 				badge.description,
 				() => applyBadge(badgeImage, badge.description, 'bttv'),
 				'bttv',
-				userHasBadge,
+				userHasBadge
 			);
 
 			if (userHasBadge) {
@@ -295,7 +295,7 @@ async function fetchUserData(userName) {
 			'No FFZ Badge',
 			() => clearBadges('ffz'),
 			'ffz',
-			ffzIDs.includes(userID),
+			ffzIDs.includes(userID)
 		);
 
 		let ffzBadge = false;
@@ -319,7 +319,7 @@ async function fetchUserData(userName) {
 				badge.title,
 				() => applyBadge(badgeImage, badge.title, 'ffz', badge.color, badge.name),
 				'ffz',
-				ffzBadge,
+				ffzBadge
 			);
 
 			if (ffzBadges.users[badge.id].includes(userID)) {
@@ -333,7 +333,7 @@ async function fetchUserData(userName) {
 			'No FFZ:AP Badge',
 			() => clearBadges('ffzap'),
 			'ffzap',
-			ffzapIDs.includes(userID),
+			ffzapIDs.includes(userID)
 		);
 
 		let tier3Hashes = [];
@@ -365,7 +365,7 @@ async function fetchUserData(userName) {
 				() => applyBadge(badgeLink, title, 'ffzap', colorCode),
 				'ffzap',
 				userHasBadge,
-				removedFromGlobal,
+				removedFromGlobal
 			);
 		}
 		selectedBadges('ffzap');
@@ -376,7 +376,7 @@ async function fetchUserData(userName) {
 			'No Chatterino Badge',
 			() => clearBadges('chatterino'),
 			'chatterino',
-			chatterinoIDs.includes(userID),
+			chatterinoIDs.includes(userID)
 		);
 
 		for (const badge of chatterinoBadges) {
@@ -386,7 +386,7 @@ async function fetchUserData(userName) {
 				badge.tooltip,
 				() => applyBadge(badge.image3, badge.tooltip, 'chatterino'),
 				'chatterino',
-				userHasBadge,
+				userHasBadge
 			);
 
 			if (userHasBadge) {
@@ -400,7 +400,7 @@ async function fetchUserData(userName) {
 			'No DankChat Badge',
 			() => clearBadges('dankchat'),
 			'dankchat',
-			dankIDs.includes(userID),
+			dankIDs.includes(userID)
 		);
 
 		let dankBadge = false;
@@ -411,7 +411,7 @@ async function fetchUserData(userName) {
 				badge.type,
 				() => applyBadge(badge.url, badge.type, 'dankchat'),
 				'dankchat',
-				userHasBadge,
+				userHasBadge
 			);
 
 			if (userHasBadge && !dankBadge) {
@@ -426,7 +426,7 @@ async function fetchUserData(userName) {
 			'No Chatty Badge',
 			() => clearBadges('chatty'),
 			'chatty',
-			chattyIDs.includes(userData[0].login),
+			chattyIDs.includes(userData[0].login)
 		);
 
 		for (const badge of chattyBadges) {
@@ -436,7 +436,7 @@ async function fetchUserData(userName) {
 				badge.meta_title,
 				() => applyBadge(badge.image_url_4, badge.meta_title, 'chatty'),
 				'chatty',
-				userHasBadge,
+				userHasBadge
 			);
 
 			if (userHasBadge) {
@@ -448,7 +448,7 @@ async function fetchUserData(userName) {
 		const getStvUserCosmetics = await getCachedOrFetch(
 			`7tvCosmetics:${userID}`,
 			async () => stv.getUserCosmetics(userID),
-			1,
+			1
 		);
 
 		const alreadyApplyedPaints = new Set();
@@ -462,7 +462,7 @@ async function fetchUserData(userName) {
 			'No 7TV Badge',
 			() => clearBadges('7tv'),
 			'7tv',
-			stvUserBadges.length,
+			stvUserBadges.length
 		);
 
 		for (const badge of stvCosmetics.badges) {
@@ -483,7 +483,7 @@ async function fetchUserData(userName) {
 				badge.description,
 				() => applyBadge(badgeImage, badge.name, '7tv'),
 				'7tv',
-				!!ownsBadge,
+				!!ownsBadge
 			);
 
 			const isSelected = ownsBadge?.selected;
@@ -531,7 +531,7 @@ async function fetchUserData(userName) {
 			'No Chatsen Badge',
 			() => clearBadges('chatsen'),
 			'chatsen',
-			chatsenIDs.includes(userID),
+			chatsenIDs.includes(userID)
 		);
 
 		const chatsenUser = chatsenBadges.users.find((u) => u.id == String(userID));
@@ -542,7 +542,7 @@ async function fetchUserData(userName) {
 				badge.title,
 				() => applyBadge(badge.image, badge.title, 'chatsen', null, badge.name),
 				'chatsen',
-				userHasBadge,
+				userHasBadge
 			);
 
 			if (userHasBadge) {
@@ -556,7 +556,7 @@ async function fetchUserData(userName) {
 			'No Homies Badge',
 			() => clearBadges('homies'),
 			'homies',
-			homiesIDs.includes(userID),
+			homiesIDs.includes(userID)
 		);
 
 		const homiesBadge = homiesCustomBadges.find((b) => b.userId == userID);
@@ -570,7 +570,7 @@ async function fetchUserData(userName) {
 				() => applyBadge(badgeImage, badgeName, 'homies', null, 'user'),
 				'homies',
 				true,
-				true,
+				true
 			);
 
 			applyBadge(badgeImage, badgeName, 'homies', null, 'user');
@@ -583,7 +583,7 @@ async function fetchUserData(userName) {
 				badge.tooltip,
 				() => applyBadge(badge.image3, badge.tooltip, 'homies'),
 				'homies',
-				userHasBadge,
+				userHasBadge
 			);
 
 			if (userHasBadge) {
@@ -597,7 +597,7 @@ async function fetchUserData(userName) {
 			'No PurpleTV Badge',
 			() => clearBadges('purpletv'),
 			'purpletv',
-			purpletvIDs.includes(userID),
+			purpletvIDs.includes(userID)
 		);
 
 		let purpleUniqueBadges = [];
@@ -618,7 +618,7 @@ async function fetchUserData(userName) {
 				() => applyBadge(userBadge, badgeTile, 'purpletv'),
 				'purpletv',
 				userHasBadge,
-				purpleUniqueBadges.includes(userBadge),
+				purpleUniqueBadges.includes(userBadge)
 			);
 			purpleUniqueBadges.push(userBadge);
 
@@ -675,7 +675,7 @@ async function fetchUserData(userName) {
 
 let ffzCustomBadges = {
 	mod: null,
-	vip: null,
+	vip: null
 };
 
 async function fetchChannelData(userName) {
@@ -686,7 +686,7 @@ async function fetchChannelData(userName) {
 		const channelData = await getCachedOrFetch(
 			`twitchUser:${userName.toLocaleLowerCase()}`,
 			() => twitch.getUserData(userName),
-			1,
+			1
 		);
 		if (!channelData.length) return;
 		const channelID = Number(channelData[0].id);
@@ -694,7 +694,7 @@ async function fetchChannelData(userName) {
 		const channelBadges = await getCachedOrFetch(
 			`twitchChannelBadges:${channelID}`,
 			() => twitch.getChannelData(userName),
-			1,
+			1
 		);
 
 		const channelName =
@@ -717,7 +717,7 @@ async function fetchChannelData(userName) {
 					version.title,
 					() => applyBadge(version.image_url_4x, version.title, 'twitch', null, badge.set_id),
 					'twitch-channel',
-					false,
+					false
 				);
 			}
 		}
@@ -725,21 +725,21 @@ async function fetchChannelData(userName) {
 		//FrankerFaceZ Channel
 		ffzCustomBadges = {
 			mod: null,
-			vip: null,
+			vip: null
 		};
 
 		const { moderatorBadge, vipBadge } = await getCachedOrFetch(
 			`ffzChannelBadges:${channelID}`,
 			() => ffz.getChannel(channelID),
 			1,
-			ffz.customFallback,
+			ffz.customFallback
 		);
 		await handleCustomBadges(moderatorBadge, vipBadge);
 
 		const { displayBadges, earnedBadges } = await getCachedOrFetch(
 			`twitchChannelBadges:${channelID}:${userLoaded.userID}`,
 			() => twitch.getUserBadges(channelID, channelName, userLoaded.displayName),
-			1,
+			1
 		);
 
 		if (!userLoaded.tBadges)
@@ -749,7 +749,7 @@ async function fetchChannelData(userName) {
 				() => clearBadges('twitch'),
 				'twitch-channel',
 				earnedBadges.length,
-				true,
+				true
 			);
 
 		const checkbox = document.getElementById(`check-ffzbadges`);
@@ -792,7 +792,7 @@ async function fetchChannelData(userName) {
 					() => applyBadge(badgeLink, badge.title, 'twitch', badgeColor, badge.setID),
 					'twitch-channel',
 					true,
-					true,
+					true
 				);
 
 				if (displayBadges.filter((b) => b.setID == badge.setID && b.version == badge.version).length) {
@@ -809,8 +809,8 @@ async function fetchChannelData(userName) {
 		const endFunction = performance.now();
 		console.log(
 			`User "${userLoaded.displayName}" with channel "${channelName}" loaded in ${Math.round(
-				endFunction - startFunction,
-			)}ms`,
+				endFunction - startFunction
+			)}ms`
 		);
 	} catch (error) {
 		console.error('Channel Error:', error);
@@ -1134,7 +1134,7 @@ async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours, fallb
 
 function getVisualizerWidth() {
 	return Number(
-		document.getElementById('allUserBadges').offsetWidth + document.getElementById('editText').offsetWidth,
+		document.getElementById('allUserBadges').offsetWidth + document.getElementById('editText').offsetWidth
 	);
 }
 
@@ -1292,7 +1292,7 @@ window.handleTextChange = function (element) {
 		});
 
 		sendStats('vanity', {
-			user: newText?.toLowerCase(),
+			user: newText?.toLowerCase()
 		});
 	}, 2000);
 };
@@ -1301,7 +1301,7 @@ window.toggleFFZBadges = function () {
 	const checkbox = document.getElementById(`check-ffzbadges`);
 	const displayValue = checkbox.checked;
 	sendStats('toggle-ffz-custom', {
-		value: displayValue,
+		value: displayValue
 	});
 
 	if (displayValue) {
@@ -1341,7 +1341,7 @@ window.toggleSection = function (sectionId) {
 	}
 
 	sendStats(`button-${sectionId}`, {
-		value,
+		value
 	});
 };
 
@@ -1373,7 +1373,7 @@ window.toggleMode = function () {
 	}
 
 	sendStats('vanity-mode', {
-		mode: button.textContent,
+		mode: button.textContent
 	});
 };
 
@@ -1466,7 +1466,7 @@ window.changeLinkAndTitle = function (channel) {
 window.handleColorChange = function (value) {
 	value = value?.toUpperCase() || '#FFFFFF';
 	sendStats('vanity-color', {
-		color: value,
+		color: value
 	});
 
 	document.documentElement.style.setProperty('--user-color', value);
@@ -1491,7 +1491,7 @@ window.handleChannelChange = function (value) {
 				userLoaded.tBadge[1],
 				userLoaded.tBadge[2],
 				userLoaded.tBadge[3],
-				userLoaded.tBadge[4],
+				userLoaded.tBadge[4]
 			);
 		if (userLoaded.sBadge[0])
 			applyBadge(
@@ -1499,7 +1499,7 @@ window.handleChannelChange = function (value) {
 				userLoaded.sBadge[1],
 				userLoaded.sBadge[2],
 				userLoaded.sBadge[3],
-				userLoaded.sBadge[4],
+				userLoaded.sBadge[4]
 			);
 
 		const badges = document.querySelectorAll('.platform-twitch-channel');
@@ -1509,7 +1509,7 @@ window.handleChannelChange = function (value) {
 
 		ffzCustomBadges = {
 			mod: null,
-			vip: null,
+			vip: null
 		};
 
 		if (!userLoaded.loaded || !value.length) {
@@ -1521,7 +1521,7 @@ window.handleChannelChange = function (value) {
 		fetchChannelData(value);
 
 		sendStats('vanity', {
-			channel: value?.toLowerCase(),
+			channel: value?.toLowerCase()
 		});
 	}, 2000);
 };
@@ -1530,7 +1530,7 @@ window.toggleProvider = function (providerId) {
 	const checkbox = document.getElementById(`check-${providerId}`);
 	const isCheckboxChecked = checkbox.checked;
 	sendStats(`provider-${providerId}`, {
-		value: isCheckboxChecked,
+		value: isCheckboxChecked
 	});
 
 	const platformElements = document.querySelectorAll(`.platform-${providerId}`);
@@ -1648,7 +1648,7 @@ window.filterItems = function (value) {
 	timeoutId_search = setTimeout(() => {
 		if (searchField.length) {
 			sendStats('search', {
-				value: searchField,
+				value: searchField
 			});
 		}
 	}, 2000);
@@ -1671,7 +1671,7 @@ window.clearFilter = function (menu) {
 
 window.badges = {
 	mod: '',
-	vip: '',
+	vip: ''
 };
 
 window.onload = async function () {
@@ -1729,7 +1729,7 @@ window.onload = async function () {
 
 	sendStats('load-link', {
 		user: userName?.toLowerCase() ?? '',
-		channel: channelName?.toLowerCase() ?? '',
+		channel: channelName?.toLowerCase() ?? ''
 	});
 };
 

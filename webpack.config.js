@@ -9,7 +9,7 @@ module.exports = {
 	entry: './src/static/index.js',
 	output: {
 		filename: 'bundle.js',
-		path: path.resolve(__dirname, 'dist'),
+		path: path.resolve(__dirname, 'dist')
 	},
 	module: {
 		rules: [
@@ -19,9 +19,9 @@ module.exports = {
 				use: {
 					loader: 'babel-loader',
 					options: {
-						presets: ['@babel/preset-env'],
-					},
-				},
+						presets: ['@babel/preset-env']
+					}
+				}
 			},
 			{
 				test: /\.css$/,
@@ -29,15 +29,15 @@ module.exports = {
 				include: path.resolve(__dirname, 'src/static'),
 				resolve: {
 					alias: {
-						'css-loader': require.resolve('css-loader'),
-					},
-				},
-			},
-		],
+						'css-loader': require.resolve('css-loader')
+					}
+				}
+			}
+		]
 	},
 	plugins: [
 		new MiniCssExtractPlugin({
-			filename: 'styles.css',
+			filename: 'styles.css'
 		}),
 		new HtmlWebpackPlugin({
 			template: './src/index.html',
@@ -48,8 +48,8 @@ module.exports = {
 				removeRedundantAttributes: true,
 				collapseWhitespace: true,
 				useShortDoctype: true,
-				removeComments: true,
-			},
+				removeComments: true
+			}
 		}),
 		new FaviconsWebpackPlugin({
 			logo: './src/static/DankG.png',
@@ -59,10 +59,10 @@ module.exports = {
 				developerName: 'ZonianMidian',
 				start_url: '/',
 				icons: {
-					appleStartup: false,
-				},
-			},
-		}),
+					appleStartup: false
+				}
+			}
+		})
 	],
 	optimization: {
 		minimize: true,
@@ -70,12 +70,12 @@ module.exports = {
 			new TerserPlugin({
 				terserOptions: {
 					format: {
-						comments: false,
-					},
+						comments: false
+					}
 				},
-				extractComments: false,
+				extractComments: false
 			}),
-			new CssMinimizerPlugin(),
-		],
-	},
+			new CssMinimizerPlugin()
+		]
+	}
 };

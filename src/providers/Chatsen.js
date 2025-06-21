@@ -1,6 +1,6 @@
 export async function getBadges() {
 	const getBadges = await fetch(
-		`${window.cors}https://raw.githubusercontent.com/chatsen/resources/master/assets/data.json`,
+		`${window.cors}https://raw.githubusercontent.com/chatsen/resources/master/assets/data.json`
 	);
 	const badges = await getBadges.json();
 
@@ -14,7 +14,7 @@ export async function getBadges() {
 				const userBadge = userData.badges.filter((b) => b.badgeName == badgeName)[0];
 				if (!userBadge) {
 					userData.badges.push({
-						badgeName,
+						badgeName
 					});
 				}
 			} else {
@@ -22,9 +22,9 @@ export async function getBadges() {
 					id: user,
 					badges: [
 						{
-							badgeName,
-						},
-					],
+							badgeName
+						}
+					]
 				});
 			}
 		}
@@ -46,16 +46,16 @@ export const patreon = [
 	'patreon_tier2',
 	'patreon_tier3s',
 	'patreon_tier3',
-	'patreon_tier4',
+	'patreon_tier4'
 ];
 
 export const fallback = {
 	badges: [],
-	users: [],
+	users: []
 };
 
 const tiers = {
 	'Chatsen Patreon: Tier 1': 'patreon_tier1',
 	'Chatsen Patreon: Tier 2': 'patreon_tier2',
-	'Chatsen Patreon: Tier 3': 'patreon_tier3',
+	'Chatsen Patreon: Tier 3': 'patreon_tier3'
 };
