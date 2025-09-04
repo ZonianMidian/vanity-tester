@@ -303,7 +303,7 @@ export const computePaintStyle = (paint) => {
 	const backgroundColors = layers.flatMap((l) => (l.color ? [l.color] : []));
 	const background = [...backgroundColors, ...backgroundImages].join(', ');
 	if (background.trim().length > 0) {
-		styleParts.push(`background: ${background};`);
+		styleParts.push(`background: ${background} var(--user-color);`);
 	}
 
 	styleParts.push(
