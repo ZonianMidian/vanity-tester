@@ -73,7 +73,7 @@ body {
 
 .text-effect {
 	background-clip: text !important;
-	background-size: cover !important;
+	background-size: 100% 100% !important;
 	-webkit-background-clip: text !important;
 	-webkit-text-fill-color: transparent;
 }
