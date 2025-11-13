@@ -49,7 +49,9 @@ export async function getUserBadges(channelID, channelName, userName, filter) {
                     "hasChannelID": true,
                     "giftRecipientLogin": "${userName}",
                     "isViewerBadgeCollectionEnabled": true,
-                    "withStandardGifting": true
+                    "withStandardGifting": true,
+					"badgeSourceChannelID": "${channelID}",
+					"badgeSourceChannelLogin": "${channelName}"
                },
                "extensions":{
                     "persistedQuery": {
