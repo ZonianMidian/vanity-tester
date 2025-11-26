@@ -602,15 +602,12 @@ async function fetchUserData(userName) {
 		let purpleUniqueBadges = [];
 
 		for (const user of purpletvBadges.users) {
-			const customBadge = user.badgeUrl.length;
 			const devBadge = user.userId == '157861306';
 			const userHasBadge = user.userId == String(userID);
-			const userBadge = user.badgeUrl.length ? user.badgeUrl : purpletvBadges.defaultBadgeUrl;
+			const userBadge = devBadge ? user.badgeUrl : purpletvBadges.defaultBadgeUrl;
 			const badgeTile = devBadge
 				? 'PurpleTV Developer'
-				: customBadge
-					? 'PurpleTV Custom Badge'
-					: 'PurpleTV Donor Badge';
+				: 'PurpleTV Donor Badge';
 			createBadgeElement(
 				`<img src='${userBadge}' alt='PurpleTV Badge'>`,
 				badgeTile,
