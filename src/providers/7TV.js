@@ -106,13 +106,11 @@ const fullBadgeQueryFields = /* GraphQL */ `
 		id
 		name
 		description
+		images {
+			url
+		}
 	}
 `;
-
-const fullCosmeticsQuery = /* GraphQL */ `{ 
-	paints { paints ${fullPaintQueryFields} } 
-	badges { badges ${fullBadgeQueryFields} } 
-}`;
 
 const fullUserQuery = (id) => /* GraphQL */ `{ 
 	users {
@@ -190,25 +188,30 @@ export const getUserCosmetics = async (twitchId) => {
 
 	const paints = [];
 	for (const paint of data.inventory.paints ?? []) {
-		if (paint.to?.paint.id === activePaintId) {
-			paint.to.paint.selected = true;
+		const paintData = paint.to?.paint || null;
+		if (!paintData) continue;
+
+		if (paintData?.id === activePaintId) {
+			paintData.selected = true;
 		}
 
-		paints.push(paint.to.paint);
+		paints.push(paintData);
 	}
 
 	const activeBadgeId = data.style?.activeBadge?.id;
 
 	const badges = [];
 	for (const badge of data.inventory?.badges ?? []) {
-		const badgeData = badge.to.badge || null;
+		const badgeData = badge.to?.badge || null;
 		if (!badgeData) continue;
 
 		if (badgeData?.id === activeBadgeId) {
 			badgeData.selected = true;
 		}
 
-		badges.push(badge.to.badge);
+		badgeData.image = badgeData.images.find(img => img.url.endsWith('4x.webp'))?.url;
+
+		badges.push(badgeData);
 	}
 
 	return {

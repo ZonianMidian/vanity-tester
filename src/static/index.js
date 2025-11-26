@@ -473,8 +473,7 @@ async function fetchUserData(userName) {
 			alreadyApplyedBadges.add(badge.id);
 
 			const badgeID = badge.id;
-
-			const badgeImage = `https://cdn.7tv.app/badge/${badgeID}/3x`;
+			const badgeImage = badge.image;
 
 			const ownsBadge = stvUserBadges.find((b) => b.id === badgeID);
 
