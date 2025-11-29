@@ -210,6 +210,7 @@ export const getUserCosmetics = async (twitchId) => {
 		}
 
 		badgeData.image = badgeData.images.find(img => img.url.endsWith('4x.webp'))?.url;
+		delete badgeData.images;
 
 		badges.push(badgeData);
 	}
