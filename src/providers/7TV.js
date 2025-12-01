@@ -120,7 +120,7 @@ const fullUserQuery = (id) => /* GraphQL */ `{
 				activePaint { id }
 				activeBadge { id description }
 			}
-      inventory {
+      inventory (includeInaccessible: true) {
           paints {
               to {
                 paint ${fullPaintQueryFields}
