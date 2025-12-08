@@ -3,7 +3,7 @@ export async function getCustomBadges() {
 	const data = await response.json();
 	return data.badges.map((badge) => ({
 		userId: badge.userId,
-		badgeId: badge.badgeId
+		badgeId: badge.image3.match(/[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/)[0],
 	}));
 }
 

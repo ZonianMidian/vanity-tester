@@ -561,7 +561,7 @@ async function fetchUserData(userName) {
 		const homiesBadge = homiesCustomBadges.find((b) => b.userId == userID);
 		if (homiesBadge) {
 			const badgeName = `Homies ${displayName} Badge`;
-			const badgeImage = `https://chatterinohomies.com/api/badges/${homiesBadge.badgeId}?size=3x`;
+			const badgeImage = `https://cdn.chatterinohomies.com/badges/${homiesBadge.badgeId}/72.webp`;
 
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='Homies Badge'>`,
