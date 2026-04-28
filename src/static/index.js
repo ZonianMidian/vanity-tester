@@ -265,28 +265,49 @@ async function fetchUserData(userName) {
 		}
 
 		//BetterTTV
+		const bttvDataFull = await bttv.getAllBttvBadges(userID);
+
+		const globalBadges = bttvDataFull.global ?? [];
+		const proBadge = bttvDataFull.pro;
+
+		const hasGlobal = globalBadges.filter(u => u.providerId == userID).length;
+		const hasPro = !!proBadge;
+
 		createBadgeElement(
-			'<i class="fa-solid fa-eye-slash"></i>',
-			'No BTTV Badge',
-			() => clearBadges('bttv'),
-			'bttv',
-			bttvData.filter((u) => u.providerId == userID).length
+		    '<i class="fa-solid fa-eye-slash"></i>',
+		    'No BTTV Badge',
+		    () => clearBadges('bttv'),
+		    'bttv',
+		    hasGlobal + (hasPro ? 1 : 0)
 		);
 
-		for (const badge of bttvBadges) {
-			const userHasBadge = bttvData.filter((u) => u.providerId == userID && u.badge.type == badge.type).length;
-			const badgeImage = badge.svg;
-			createBadgeElement(
-				`<img src='${badgeImage}' alt='BTTV Badge'>`,
-				badge.description,
-				() => applyBadge(badgeImage, badge.description, 'bttv'),
-				'bttv',
-				userHasBadge
-			);
+		for (const badgeUser of globalBadges) {
+		    if (badgeUser.providerId != userID) continue;
+		
+		    const badgeImage = badgeUser.badge.svg;
+		    const description = badgeUser.badge.description;
+		
+		    createBadgeElement(
+		        `<img src='${badgeImage}' alt='BTTV Badge'>`,
+		        description,
+		        () => applyBadge(badgeImage, description, 'bttv'),
+		        'bttv',
+		        1
+		    );
+		
+		    applyBadge(badgeImage, description, 'bttv');
+		}
 
-			if (userHasBadge) {
-				applyBadge(badgeImage, badge.description, 'bttv');
-			}
+		if (proBadge) {
+		    createBadgeElement(
+		        `<img src='${proBadge.url}' alt='BTTV Pro'>`,
+		        'BetterTTV Pro',
+		        () => applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv'),
+		        'bttv',
+		        1
+		    );
+		
+		    applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv');
 		}
 
 		//FrankerFaceZ
