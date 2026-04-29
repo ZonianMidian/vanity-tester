@@ -226,7 +226,8 @@ button {
 	gap: 10px;
 }
 
-.badge-ffz img {
+.badge-ffz img,
+.badge-bttv img {
 	border-radius: 5px;
 }
 
@@ -248,6 +249,7 @@ button {
 
 .ffzBadge,
 .vipBadge,
+.bttvProBadge,
 .moderatorBadge {
 	border-radius: 5px;
 }

@@ -265,49 +265,43 @@ async function fetchUserData(userName) {
 		}
 
 		//BetterTTV
-		const bttvDataFull = await bttv.getAllBttvBadges(userID);
-
-		const globalBadges = bttvDataFull.global ?? [];
-		const proBadge = bttvDataFull.pro;
-
-		const hasGlobal = globalBadges.filter(u => u.providerId == userID).length;
-		const hasPro = !!proBadge;
+		const proBadge = await bttv.getProBadge(userID);
 
 		createBadgeElement(
 			'<i class="fa-solid fa-eye-slash"></i>',
 			'No BTTV Badge',
 			() => clearBadges('bttv'),
 			'bttv',
-			hasGlobal + (hasPro ? 1 : 0)
+			bttvData.filter((u) => u.providerId == userID).length || !!proBadge
 		);
 
-		for (const badgeUser of globalBadges) {
-			if (badgeUser.providerId != userID) continue;
-
-			const badgeImage = badgeUser.badge.svg;
-			const description = badgeUser.badge.description;
-
+		for (const badge of bttvBadges) {
+			const userHasBadge = bttvData.filter((u) => u.providerId == userID && u.badge.type == badge.type).length;
+			const badgeImage = badge.svg;
 			createBadgeElement(
 				`<img src='${badgeImage}' alt='BTTV Badge'>`,
-				description,
-				() => applyBadge(badgeImage, description, 'bttv'),
+				badge.description,
+				() => applyBadge(badgeImage, badge.description, 'bttv', null, 'base'),
 				'bttv',
-				1
+				userHasBadge
 			);
 
-			applyBadge(badgeImage, description, 'bttv');
+			if (userHasBadge) {
+				applyBadge(badgeImage, badge.description, 'bttv', null, 'base');
+			}
 		}
 
-		if (proBadge) {
+		if (!!proBadge) {
 			createBadgeElement(
-				`<img src='${proBadge.url}' alt='BTTV Pro'>`,
+				`<img src='${proBadge.url}' alt='BTTV Pro Badge' class='bttvProBadge'>`,
 				'BetterTTV Pro',
-				() => applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv'),
+				() => applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv', null, 'pro'),
 				'bttv',
-				1
+				true,
+				true
 			);
 
-			applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv');
+			applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv', null, 'pro');
 		}
 
 		//FrankerFaceZ
@@ -626,9 +620,7 @@ async function fetchUserData(userName) {
 			const devBadge = user.userId == '157861306';
 			const userHasBadge = user.userId == String(userID);
 			const userBadge = devBadge ? user.badgeUrl : purpletvBadges.defaultBadgeUrl;
-			const badgeTile = devBadge
-				? 'PurpleTV Developer'
-				: 'PurpleTV Donor Badge';
+			const badgeTile = devBadge ? 'PurpleTV Developer' : 'PurpleTV Donor Badge';
 			createBadgeElement(
 				`<img src='${userBadge}' alt='PurpleTV Badge'>`,
 				badgeTile,
@@ -939,6 +931,16 @@ function applyBadge(badgeLink, badgeName, platform, color, type) {
 					break;
 				default:
 					divName = 'ffz-base';
+					break;
+			}
+			break;
+		case 'bttv':
+			switch (type) {
+				case 'pro':
+					divName = 'bttv-pro';
+					break;
+				default:
+					divName = 'bttv-base';
 					break;
 			}
 			break;
