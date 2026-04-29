@@ -100,6 +100,7 @@ export async function getUserBadges(channelID, channelName, userName, filter) {
 }
 
 export const filteredBadges = [
+	'lead_moderator',
 	'artist-badge',
 	'broadcaster',
 	'subscriber',

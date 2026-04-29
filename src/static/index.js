@@ -274,40 +274,40 @@ async function fetchUserData(userName) {
 		const hasPro = !!proBadge;
 
 		createBadgeElement(
-		    '<i class="fa-solid fa-eye-slash"></i>',
-		    'No BTTV Badge',
-		    () => clearBadges('bttv'),
-		    'bttv',
-		    hasGlobal + (hasPro ? 1 : 0)
+			'<i class="fa-solid fa-eye-slash"></i>',
+			'No BTTV Badge',
+			() => clearBadges('bttv'),
+			'bttv',
+			hasGlobal + (hasPro ? 1 : 0)
 		);
 
 		for (const badgeUser of globalBadges) {
-		    if (badgeUser.providerId != userID) continue;
-		
-		    const badgeImage = badgeUser.badge.svg;
-		    const description = badgeUser.badge.description;
-		
-		    createBadgeElement(
-		        `<img src='${badgeImage}' alt='BTTV Badge'>`,
-		        description,
-		        () => applyBadge(badgeImage, description, 'bttv'),
-		        'bttv',
-		        1
-		    );
-		
-		    applyBadge(badgeImage, description, 'bttv');
+			if (badgeUser.providerId != userID) continue;
+
+			const badgeImage = badgeUser.badge.svg;
+			const description = badgeUser.badge.description;
+
+			createBadgeElement(
+				`<img src='${badgeImage}' alt='BTTV Badge'>`,
+				description,
+				() => applyBadge(badgeImage, description, 'bttv'),
+				'bttv',
+				1
+			);
+
+			applyBadge(badgeImage, description, 'bttv');
 		}
 
 		if (proBadge) {
-		    createBadgeElement(
-		        `<img src='${proBadge.url}' alt='BTTV Pro'>`,
-		        'BetterTTV Pro',
-		        () => applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv'),
-		        'bttv',
-		        1
-		    );
-		
-		    applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv');
+			createBadgeElement(
+				`<img src='${proBadge.url}' alt='BTTV Pro'>`,
+				'BetterTTV Pro',
+				() => applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv'),
+				'bttv',
+				1
+			);
+
+			applyBadge(proBadge.url, 'BetterTTV Pro', 'bttv');
 		}
 
 		//FrankerFaceZ
@@ -910,6 +910,9 @@ function applyBadge(badgeLink, badgeName, platform, color, type) {
 						badgeLink = ffzCustomBadges.mod ?? badgeLink;
 						color = '#00AD03';
 					}
+					break;
+				case 'lead_moderator':
+					divName = 'role';
 					break;
 				case 'vip':
 					divName = 'role';
