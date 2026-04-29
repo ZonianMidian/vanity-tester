@@ -20,7 +20,16 @@ export async function getChannelData(userName) {
 			throw new Error();
 		}
 
-		return await channelData.json();
+		const badges = await channelData.json();
+
+		return Object.entries(badges).map(([_, data]) => ({
+			set_id: data.set_id,
+			versions: data.versions.map((version) => ({
+				id: version.id,
+				image_url_4x: version.image_url_4x,
+				title: version.title
+			}))
+		}));
 	} catch (error) {
 		return [];
 	}
@@ -28,7 +37,17 @@ export async function getChannelData(userName) {
 
 export async function getBadges() {
 	const getBadges = await fetch(`https://api.ivr.fi/v2/twitch/badges/global`);
-	return await getBadges.json();
+
+	const badges = await getBadges.json();
+
+	return Object.entries(badges).map(([_, data]) => ({
+		set_id: data.set_id,
+		versions: data.versions.map((version) => ({
+			id: version.id,
+			image_url_4x: version.image_url_4x,
+			title: version.title
+		}))
+	}));
 }
 
 export async function getUserBadges(channelID, channelName, userName, filter) {
@@ -64,8 +83,18 @@ export async function getUserBadges(channelID, channelName, userName, filter) {
 	});
 
 	const badgesData = (await getUserBadges.json())[0]?.data;
-	const displayBadges = badgesData?.targetUser?.displayBadges || [];
-	const earnedBadges = badgesData?.channelViewer?.earnedBadges || [];
+	const displayBadges =
+		badgesData?.targetUser?.displayBadges?.map((badge) => ({
+			setID: badge.setID,
+			version: badge.version
+		})) || [];
+	const earnedBadges =
+		badgesData?.channelViewer?.earnedBadges?.map((badge) => ({
+			setID: badge.setID,
+			image4x: badge.image4x,
+			title: badge.title,
+			version: badge.version
+		})) || [];
 
 	return { displayBadges, earnedBadges };
 }
