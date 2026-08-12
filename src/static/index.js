@@ -153,6 +153,7 @@ async function fetchData() {
 	});
 
 	moltorinoBadges = Object.values(uniqueMoltorinoBadges);
+	moltorinoIDs = moltorinoBadges.flatMap((badge) => badge.users).map((user) => parseInt(user.id));
 
 	// JilChat
 	jilchatIDs = jilchatData.flatMap((badge) => badge.users).map((user) => parseInt(user.twitch_id));
