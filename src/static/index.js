@@ -9,6 +9,8 @@ import * as twitch from '../providers/Twitch.js';
 import * as chatty from '../providers/Chatty.js';
 import * as homies from '../providers/Homies.js';
 import * as stv from '../providers/7TV.js';
+import * as moltorino from '../providers/Moltorino.js';
+import * as jilchat from '../providers/JilChat.js';
 import './main.css';
 
 let cosmeticsLoaded = false;
@@ -35,6 +37,11 @@ let dankBadges;
 let ffzBadges;
 let bttvData;
 let dankData;
+let moltoData;
+let moltorinoBadges = [];
+let moltorinoIDs = [];
+let jilchatData = [];
+let jilchatIDs = [];
 
 async function fetchData() {
 	const startFunction = performance.now();
@@ -50,7 +57,9 @@ async function fetchData() {
 		getCachedOrFetch('stvCosmetics', () => stv.getCosmetics(), 24),
 		getCachedOrFetch('twitchBadges', () => twitch.getBadges(), 24),
 		getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24),
-		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24)
+		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24),
+		getCachedOrFetch('moltorinoBadges', () => moltorino.getBadges(), 24),
+		getCachedOrFetch('jilchatBadges', () => jilchat.getBadges(), 24)
 	]).then((res) => res.map((result) => result.value));
 
 	[
@@ -65,7 +74,9 @@ async function fetchData() {
 		stvCosmetics,
 		twitchBadges,
 		ffzapBadges,
-		bttvData
+		bttvData,
+		moltoData,
+		jilchatData
 	] = results;
 
 	//PurpleTV
@@ -131,6 +142,21 @@ async function fetchData() {
 	});
 
 	bttvBadges = Object.values(uniqueBttvBadges).sort((a, b) => a.type - b.type);
+
+	// Moltorino
+	const uniqueMoltorinoBadges = {};
+
+	moltoData.forEach((badge) => {
+		if (!uniqueMoltorinoBadges[badge.id]) {
+			uniqueMoltorinoBadges[badge.id] = badge;
+		}
+	});
+
+	moltorinoBadges = Object.values(uniqueMoltorinoBadges);
+	moltorinoIDs = moltorinoBadges.flatMap((badge) => badge.users).map((user) => parseInt(user.id));
+
+	// JilChat
+	jilchatIDs = jilchatData.flatMap((badge) => badge.users).map((user) => parseInt(user.twitch_id));
 
 	//Display
 	loaded = true;
@@ -633,6 +659,74 @@ async function fetchUserData(userName) {
 
 			if (userHasBadge) {
 				applyBadge(userBadge, badgeTile, 'purpletv');
+			}
+		}
+
+		// Moltorino
+		createBadgeElement(
+			'<i class="fa-solid fa-eye-slash"></i>',
+			'No Moltorino Badge',
+			() => clearBadges('moltorino'),
+			'moltorino',
+			moltorinoIDs.includes(userID)
+		);
+
+		let moltorinoBadge = false;
+
+		for (const badge of moltorinoBadges) {
+			const userHasBadge = badge.users.some(
+				(user) => user.id === userID.toString()
+			);
+		
+			createBadgeElement(
+				`<img src='${badge.images['3x']}' alt='Moltorino Badge'>`,
+				badge.tooltip,
+				() => applyBadge(badge.images['3x'], badge.tooltip, 'moltorino'),
+				'moltorino',
+				userHasBadge
+			);
+		
+			if (userHasBadge && !moltorinoBadge) {
+				moltorinoBadge = true;
+				applyBadge(
+					badge.images['3x'],
+					badge.tooltip,
+					'moltorino'
+				);
+			}
+		}
+
+		// JilChat
+		createBadgeElement(
+			'<i class="fa-solid fa-eye-slash"></i>',
+			'No JilChat Badge',
+			() => clearBadges('jilchat'),
+			'jilchat',
+			jilchatIDs.includes(userID)
+		);
+
+		let jilchatBadge = false;
+
+		for (const badge of jilchatData) {
+			const userHasBadge = badge.users.some(
+				(user) => user.twitch_id === userID.toString()
+			);
+		
+			createBadgeElement(
+				`<img src='${badge.image_url}' alt='JilChat Badge'>`,
+				badge.name,
+				() => applyBadge(badge.image_url, badge.name, 'jilchat'),
+				'jilchat',
+				userHasBadge
+			);
+		
+			if (userHasBadge && !jilchatBadge) {
+				jilchatBadge = true;
+				applyBadge(
+					badge.image_url,
+					badge.name,
+					'jilchat'
+				);
 			}
 		}
 
