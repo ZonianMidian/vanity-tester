@@ -38,8 +38,6 @@ let ffzBadges;
 let bttvData;
 let dankData;
 let moltoData;
-let moltorinoBadges = [];
-let moltorinoIDs = [];
 let jilchatData = [];
 let jilchatIDs = [];
 
@@ -142,18 +140,6 @@ async function fetchData() {
 	});
 
 	bttvBadges = Object.values(uniqueBttvBadges).sort((a, b) => a.type - b.type);
-
-	// Moltorino
-	const uniqueMoltorinoBadges = {};
-
-	moltoData.forEach((badge) => {
-		if (!uniqueMoltorinoBadges[badge.id]) {
-			uniqueMoltorinoBadges[badge.id] = badge;
-		}
-	});
-
-	moltorinoBadges = Object.values(uniqueMoltorinoBadges);
-	moltorinoIDs = moltorinoBadges.flatMap((badge) => badge.users).map((user) => parseInt(user.id));
 
 	// JilChat
 	jilchatIDs = jilchatData.flatMap((badge) => badge.users).map((user) => parseInt(user.twitch_id));
@@ -663,20 +649,22 @@ async function fetchUserData(userName) {
 		}
 
 		// Moltorino
+		const user = moltoData.users?.[userID.toString()];
+		const userBadges = user?.badges ?? [];
+		const activeBadgeId = user?.activeBadge;
+
 		createBadgeElement(
 			'<i class="fa-solid fa-eye-slash"></i>',
 			'No Moltorino Badge',
 			() => clearBadges('moltorino'),
 			'moltorino',
-			moltorinoIDs.includes(userID)
+			userBadges.length === 0
 		);
 
 		let moltorinoBadge = false;
 
-		for (const badge of moltorinoBadges) {
-			const userHasBadge = badge.users.some(
-				(user) => user.id === userID.toString()
-			);
+		for (const badge of moltoData.badges ?? []) {
+		    const userHasBadge = userBadges.includes(badge.id);
 		
 			createBadgeElement(
 				`<img src='${badge.images['3x']}' alt='Moltorino Badge'>`,
@@ -686,7 +674,7 @@ async function fetchUserData(userName) {
 				userHasBadge
 			);
 		
-			if (userHasBadge && !moltorinoBadge) {
+			if (userHasBadge && badge.id === activeBadgeId) {
 				moltorinoBadge = true;
 				applyBadge(
 					badge.images['3x'],
