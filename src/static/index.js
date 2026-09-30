@@ -653,12 +653,16 @@ async function fetchUserData(userName) {
 		const userBadges = user?.badges ?? [];
 		const activeBadgeId = user?.activeBadge;
 
+		const moltorinoBadges = (moltoData.badges ?? []).some(
+    		badge => userBadges.includes(badge.id)
+		);
+
 		createBadgeElement(
 			'<i class="fa-solid fa-eye-slash"></i>',
 			'No Moltorino Badge',
 			() => clearBadges('moltorino'),
 			'moltorino',
-			userBadges.length === 0
+			moltorinoBadges
 		);
 
 		let moltorinoBadge = false;
@@ -692,7 +696,7 @@ async function fetchUserData(userName) {
 		    'No JilChat Badge',
 		    () => clearBadges('jilchat'),
 		    'jilchat',
-		    jilchatIDs.includes(userID)
+		    jilchatUserBadges.length > 0
 		);
 
 		let jilchatBadge = false;
