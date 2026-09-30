@@ -39,7 +39,6 @@ let bttvData;
 let dankData;
 let moltoData;
 let jilchatData = [];
-let jilchatIDs = [];
 
 async function fetchData() {
 	const startFunction = performance.now();
@@ -140,9 +139,6 @@ async function fetchData() {
 	});
 
 	bttvBadges = Object.values(uniqueBttvBadges).sort((a, b) => a.type - b.type);
-
-	// JilChat
-	jilchatIDs = jilchatData.flatMap((badge) => badge.users).map((user) => parseInt(user.twitch_id));
 
 	//Display
 	loaded = true;
