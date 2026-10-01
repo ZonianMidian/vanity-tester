@@ -697,48 +697,38 @@ async function fetchUserData(userName) {
 
 		let jilchatBadge = false;
 
-		const renderedJilchatBadges = new Set();
-		const userBadgeSlugs = new Set(
-		    jilchatUserBadges.map((badge) => badge.slug)
-		);
+		const allJilchatBadges = [
+			...jilchatData,
+			...jilchatUserBadges.filter(
+				userBadge => !jilchatData.some(
+					badge => badge.slug === userBadge.slug
+				)
+			)
+		];
 
-		for (const badge of jilchatData) {
-		    const userHasBadge = userBadgeSlugs.has(badge.slug);
+		for (const badge of allJilchatBadges) {
+			const userBadge = jilchatUserBadges.find(
+				b => b.slug === badge.slug
+			);
 		
-		    renderedJilchatBadges.add(badge.slug);
+			const userHasBadge = !!userBadge;
 		
-		    createBadgeElement(
-		        `<img src='${badge.image_url}' alt='JilChat Badge'>`,
-		        badge.name,
-		        () => applyBadge(badge.image_url, badge.name, 'jilchat'),
-		        'jilchat',
-		        userHasBadge
-		    );
+			createBadgeElement(
+				`<img src="${badge.image_url}" alt="JilChat Badge">`,
+				badge.name,
+				() => applyBadge(badge.image_url, badge.name, 'jilchat'),
+				'jilchat',
+				userHasBadge
+			);
 		
-		    if (userHasBadge && !jilchatBadge) {
-		        jilchatBadge = true;
-		        applyBadge(
-		        	badge.image_url,
-		            badge.name,
-		            'jilchat'
-		        );
-		    }
-		}
-
-		for (const badge of jilchatUserBadges) {
-		    if (renderedJilchatBadges.has(badge.slug)) {
-		        continue;
-		    };
-		
-		    renderedJilchatBadges.add(badge.slug);
-		
-		    createBadgeElement(
-		        `<img src='${badge.image_url}' alt='JilChat Badge'>`,
-		        badge.name,
-		        () => applyBadge(badge.image_url, badge.name, 'jilchat'),
-		        'jilchat',
-		        true
-		    );
+			if (userBadge?.visible === true && badge.users?.some(user => user.twitch_id === String(userID)) && !jilchatBadge) {
+				jilchatBadge = true;
+				applyBadge(
+					badge.image_url,
+					badge.name,
+					'jilchat'
+				);
+			}
 		}
 
 		//Display
