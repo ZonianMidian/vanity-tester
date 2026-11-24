@@ -11,6 +11,8 @@ import * as homies from '../providers/Homies.js';
 import * as stv from '../providers/7TV.js';
 import * as moltorino from '../providers/Moltorino.js';
 import * as jilchat from '../providers/JilChat.js';
+import * as chatlee from '../providers/Chatlee.js';
+import * as wydios from '../providers/Wydios.js';
 import './main.css';
 
 let cosmeticsLoaded = false;
@@ -39,6 +41,8 @@ let bttvData;
 let dankData;
 let moltoData;
 let jilchatData = [];
+let chatleeData = [];
+let wydiosData = [];
 
 async function fetchData() {
 	const startFunction = performance.now();
@@ -56,7 +60,9 @@ async function fetchData() {
 		getCachedOrFetch('ffzapBadges', () => ffzap.getBadges(), 24),
 		getCachedOrFetch('bttvBadges', () => bttv.getBadges(), 24),
 		getCachedOrFetch('moltorinoBadges', () => moltorino.getBadges(), 24),
-		getCachedOrFetch('jilchatBadges', () => jilchat.getBadges(), 24)
+		getCachedOrFetch('jilchatBadges', () => jilchat.getBadges(), 24),
+		getCachedOrFetch('chatleeBadges', () => chatlee.getBadges(), 24),
+		getCachedOrFetch('wydiosBadges', () => wydios.getBadges(), 24)
 	]).then((res) => res.map((result) => result.value));
 
 	[
@@ -73,7 +79,9 @@ async function fetchData() {
 		ffzapBadges,
 		bttvData,
 		moltoData,
-		jilchatData
+		jilchatData,
+		chatleeData,
+		wydiosData
 	] = results;
 
 	//PurpleTV
@@ -199,13 +207,34 @@ async function fetchUserData(userName) {
 		setCookie('userName', displayName);
 		maxWidthVisualizer();
 
+		//Preload user data to avoid sequential awaits later
+		const [
+		    twitchBadgeResult,
+		    proBadge,
+		    getStvUserCosmetics,
+		    jilchatUserBadges,
+			chatleeUserBadges,
+			wydiosUserBadges
+		] = await Promise.all([
+		    getCachedOrFetch(
+		        `twitchUserBadges:${userID}`,
+		        () => twitch.getUserBadges(userID, displayName),
+		        1,
+		        twitch.fallback
+		    ),
+		    bttv.getProBadge(userID),
+		    getCachedOrFetch(
+		        `7tvCosmetics:${userID}`,
+		        () => stv.getUserCosmetics(userID),
+		        1
+		    ),
+		    jilchat.getUserBadges(userID),
+			chatlee.getUserBadges(userID),
+			wydios.getUserBadges(userID)
+		]);
+
 		//Twitch
-		let { displayBadges, earnedBadges } = await getCachedOrFetch(
-			`twitchUserBadges:${userID}`,
-			() => twitch.getUserBadges(userID, displayName),
-			1,
-			twitch.fallback
-		);
+		let { displayBadges, earnedBadges } = twitchBadgeResult;
 		earnedBadges = earnedBadges?.filter((b) => !twitch.filteredBadges.includes(b.setID)) ?? [];
 
 		let staff = false;
@@ -273,8 +302,6 @@ async function fetchUserData(userName) {
 		}
 
 		//BetterTTV
-		const proBadge = await bttv.getProBadge(userID);
-
 		createBadgeElement(
 			'<i class="fa-solid fa-eye-slash"></i>',
 			'No BTTV Badge',
@@ -468,12 +495,6 @@ async function fetchUserData(userName) {
 		}
 
 		//7TV
-		const getStvUserCosmetics = await getCachedOrFetch(
-			`7tvCosmetics:${userID}`,
-			async () => stv.getUserCosmetics(userID),
-			1
-		);
-
 		const alreadyApplyedPaints = new Set();
 		const alreadyApplyedBadges = new Set();
 
@@ -644,7 +665,7 @@ async function fetchUserData(userName) {
 			}
 		}
 
-		// Moltorino
+		//Moltorino
 		const user = moltoData.users?.[userID.toString()];
 		const userBadges = user?.badges ?? [];
 		const activeBadgeId = user?.activeBadge;
@@ -674,7 +695,7 @@ async function fetchUserData(userName) {
 				userHasBadge
 			);
 		
-			if (userHasBadge && badge.id === activeBadgeId) {
+			if (userHasBadge && badge.id === activeBadgeId && !moltorinoBadge) {
 				moltorinoBadge = true;
 				applyBadge(
 					badge.images['3x'],
@@ -684,9 +705,7 @@ async function fetchUserData(userName) {
 			}
 		}
 
-		// JilChat
-		const jilchatUserBadges = await jilchat.getUserBadges(userID);
-
+		//JilChat
 		createBadgeElement(
 		    '<i class="fa-solid fa-eye-slash"></i>',
 		    'No JilChat Badge',
@@ -729,6 +748,108 @@ async function fetchUserData(userName) {
 					'jilchat'
 				);
 			}
+		}
+
+		//Chatlee
+		const chatleeUserBadgeList = chatleeUserBadges?.badges ?? [];
+
+		createBadgeElement(
+		    '<i class="fa-solid fa-eye-slash"></i>',
+		    'No Chatlee Badge',
+		    () => clearBadges('chatlee'),
+		    'chatlee',
+		    chatleeUserBadgeList.length > 0
+		);
+
+		let chatleeBadge = false;
+
+		const allChatleeBadges = [
+		    ...chatleeData,
+		    ...chatleeUserBadgeList.filter(
+		        userBadge => !chatleeData.some(
+		            badge => badge.id === userBadge.id
+		        )
+		    )
+		];
+
+		for (const badge of allChatleeBadges) {
+		    const userBadge = chatleeUserBadgeList.find(
+		        b => b.id === badge.id
+		    );
+		
+		    const userHasBadge = !!userBadge;
+		
+		    createBadgeElement(
+		        `<img src="${badge.image3}" alt="Chatlee Badge">`,
+		        badge.tooltip,
+		        () => applyBadge(badge.image3, badge.tooltip, 'chatlee'),
+		        'chatlee',
+		        userHasBadge
+		    );
+		
+		    if (
+		        chatleeUserBadges?.activeId !== null &&
+		        badge.id === chatleeUserBadges.activeId &&
+		        !chatleeBadge
+		    ) {
+		        chatleeBadge = true;
+		        applyBadge(
+		            badge.image3,
+		            badge.tooltip,
+		            'chatlee'
+		        );
+		    }
+		}
+
+		//Wydios
+		const wydiosUserBadgeList = wydiosUserBadges?.badges ?? [];
+
+		createBadgeElement(
+		    '<i class="fa-solid fa-eye-slash"></i>',
+		    'No Wydios Badge',
+		    () => clearBadges('wydios'),
+		    'wydios',
+		    wydiosUserBadgeList.length > 0
+		);
+
+		let wydiosBadge = false;
+
+		const allWydiosBadges = [
+		    ...wydiosData,
+		    ...wydiosUserBadgeList.filter(
+		        userBadge => !wydiosData.some(
+		            badge => badge.slug === userBadge.slug
+		        )
+		    )
+		];
+
+		for (const badge of allWydiosBadges) {
+		    const userBadge = wydiosUserBadgeList.find(
+		        b => b.slug === badge.slug
+		    );
+		
+		    const userHasBadge = !!userBadge;
+		
+		    createBadgeElement(
+		        `<img src="${badge.urls['72']}" alt="Wydios Badge">`,
+		        badge.name,
+		        () => applyBadge(badge.urls['72'], badge.name, 'wydios'),
+		        'wydios',
+		        userHasBadge
+		    );
+		
+		    if (
+		        wydiosUserBadges?.activeId !== null &&
+		        badge.id === wydiosUserBadges.activeId &&
+		        !wydiosBadge
+		    ) {
+		        wydiosBadge = true;
+		        applyBadge(
+		            badge.urls['72'],
+		            badge.name,
+		            'wydios'
+		        );
+		    }
 		}
 
 		//Display
