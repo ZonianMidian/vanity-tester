@@ -765,6 +765,7 @@ async function fetchUserData(userName) {
 		document.getElementById('optionsMessage').style.display = 'none';
 		document.getElementById('search-button').style.display = 'block';
 		document.getElementById('rotating-circle').style.display = 'none';
+		updateCounts();
 
 		setTimeout(() => maxWidthVisualizer(), 1000);
 
@@ -909,6 +910,7 @@ async function fetchChannelData(userName) {
 		document.getElementById('rotating-circle').style.display = 'none';
 		document.getElementById('customChannel').disabled = false;
 		changeLinkAndTitle(channelName);
+		updateCounts();
 
 		const endFunction = performance.now();
 		console.log(
@@ -1628,6 +1630,7 @@ window.handleChannelChange = function (value) {
 			mod: null,
 			vip: null
 		};
+		updateCounts();
 
 		if (!userLoaded.loaded || !value.length) {
 			document.querySelector('.platform-twitch-channel').style.display = 'none';
@@ -1714,9 +1717,81 @@ window.showSearchField = function () {
 	}, 0);
 };
 
+let countSearch = '';
+
+function providerName(element) {
+	const provider = [...element.classList].find((c) => c.startsWith('platform-')).slice(9);
+	return document.getElementById(`check-${provider}`).parentElement.textContent.trim();
+}
+
+function countItems(container, selector) {
+	//Skip "No X Badge" / "No 7TV Paint" placeholders
+	const items = [...container.querySelectorAll(`:scope > ${selector}`)].filter(
+		(item) => !item.querySelector('.fa-eye-slash, [data-paint-id="noPaint"]')
+	);
+	return {
+		total: items.length,
+		visible: items.filter((item) => !item.classList.contains('invisibleElement')).length
+	};
+}
+
+function setCountLabel(element, label) {
+	if (label) element.dataset.label = label;
+	else delete element.dataset.label;
+}
+
+function updateCounts() {
+	const badgesSection = document.getElementById('badgesSection');
+	const paintsSection = document.getElementById('paintsSection');
+	const channel = document.getElementById('customChannel').value.trim();
+
+	const groups = [...badgesSection.querySelectorAll('.allCosmetics .badges')].map((all) => {
+		const platform = [...all.classList].filter((c) => c.startsWith('platform-')).pop().slice(9);
+		const isChannel = platform == 'twitch-channel';
+		return {
+			name: isChannel ? `${providerName(all)}: ${channel}` : providerName(all),
+			all,
+			user: badgesSection.querySelector(`.userCosmetics .platform-${platform}`),
+			selector: '.badge',
+			isChannel
+		};
+	});
+	groups.push({
+		name: `${providerName(paintsSection)} Paints`,
+		all: paintsSection.querySelector('.allCosmetics'),
+		user: paintsSection.querySelector('.userCosmetics'),
+		selector: '.paintContainer',
+		isChannel: false
+	});
+
+	for (const { name, all, user, selector, isChannel } of groups) {
+		const allCount = countItems(all, selector);
+		const userCount = countItems(user, selector);
+
+		if (isChannel && !allCount.total && !userCount.total) {
+			setCountLabel(all, null);
+			setCountLabel(user, null);
+		} else if (countSearch) {
+			setCountLabel(all, allCount.visible && `${name} · ${allCount.visible} matching`);
+			setCountLabel(user, userCount.visible && `${name} · ${userCount.visible} matching`);
+		} else {
+			setCountLabel(all, `${name} · ${allCount.total}`);
+			//Channel rows also hold mod/vip/sub, so there's no total to compare against
+			setCountLabel(
+				user,
+				userCount.total &&
+					(isChannel
+						? `${name} · ${userCount.total} owned`
+						: `${name} · ${userCount.total} of ${allCount.total} owned`)
+			);
+		}
+	}
+}
+
 let timeoutId_search;
 window.filterItems = function (value) {
 	const searchField = value.toLowerCase();
+	countSearch = searchField;
 	const sections = document.getElementById('sections').children;
 
 	for (const section of sections) {
@@ -1757,6 +1832,8 @@ window.filterItems = function (value) {
 			}
 		}
 	}
+
+	updateCounts();
 
 	if (timeoutId_search) {
 		clearTimeout(timeoutId_search);

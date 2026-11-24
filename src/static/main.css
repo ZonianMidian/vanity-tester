@@ -226,6 +226,21 @@ button {
 	gap: 10px;
 }
 
+.badges[data-label]::before,
+#paintsSection [data-label]::before {
+	content: attr(data-label);
+	flex-basis: 100%;
+	color: rgba(255, 255, 255, 0.55);
+	font-size: 0.85rem;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	text-align: center;
+}
+
+.badges[data-label] {
+	margin-top: 10px;
+}
+
 .badge-ffz img,
 .badge-bttv img {
 	border-radius: 5px;
