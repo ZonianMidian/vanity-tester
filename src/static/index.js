@@ -15,6 +15,9 @@ import * as chatlee from '../providers/Chatlee.js';
 import * as wydios from '../providers/Wydios.js';
 import './main.css';
 
+const dbName = 'vanity-cache';
+const storeName = 'fallback';
+let dbPromise = null;
 let cosmeticsLoaded = false;
 let chatterinoIDs = [];
 let homiesCustomBadges;
@@ -1329,47 +1332,169 @@ async function getImageHash(imageURL) {
 	}
 }
 
+function getCacheDB() {
+    if (dbPromise) return dbPromise;
+
+    dbPromise = new Promise((resolve, reject) => {
+        const request = indexedDB.open(dbName, 1);
+
+        request.onupgradeneeded = () => {
+            const db = request.result;
+
+            if (!db.objectStoreNames.contains(storeName)) {
+                db.createObjectStore(storeName, {
+                    keyPath: 'key'
+                });
+            }
+        };
+
+        request.onsuccess = () => {
+            const db = request.result;
+
+            db.onclose = () => {
+                dbPromise = null;
+            };
+
+            db.onversionchange = () => {
+                db.close();
+                dbPromise = null;
+            };
+
+            resolve(db);
+        };
+
+        request.onerror = () => {
+            dbPromise = null;
+            reject(request.error);
+        };
+
+        request.onblocked = () => {
+            console.warn('IndexedDB upgrade blocked.');
+        };
+    });
+
+    return dbPromise;
+}
+
+async function idbRequest(mode, action) {
+    const db = await getCacheDB();
+
+    return new Promise((resolve, reject) => {
+        const transaction = db.transaction(storeName, mode);
+        const store = transaction.objectStore(storeName);
+
+        let result;
+
+        try {
+            const request = action(store);
+
+            request.onsuccess = () => {
+                result = request.result;
+            };
+
+            request.onerror = () => {
+                reject(request.error);
+            };
+        } catch (error) {
+            reject(error);
+            return;
+        }
+
+        transaction.oncomplete = () => resolve(result);
+        transaction.onerror = () => reject(transaction.error);
+        transaction.onabort = () => reject(transaction.error);
+    });
+}
+
+function idbGet(key) {
+    return idbRequest('readonly', store => store.get(key));
+}
+
+function idbSet(key, data, timestamp = Date.now()) {
+    return idbRequest('readwrite', store =>
+        store.put({ key, data, timestamp })
+    );
+}
+
+function idbDelete(key) {
+    return idbRequest('readwrite', store => store.delete(key));
+}
+
 async function getCachedOrFetch(key, fetchFunction, expirationTimeInHours, fallback) {
-	const start = performance.now();
+    const start = performance.now();
+    const expirationTime = expirationTimeInHours * 3600000;
 
-	try {
-		const cachedData = localStorage.getItem(key);
-		let cachedTime;
+    try {
+        const cachedData = localStorage.getItem(key);
+        const cachedTime = key.includes(':')
+            ? getCookie(`${key}_timestamp`)
+            : null;
 
-		if (key.includes(':')) cachedTime = getCookie(`${key}_timestamp`);
+        if (cachedData) {
+            const isValid = !cachedTime ||
+                Date.now() - Number(cachedTime) < expirationTime;
 
-		if (
-			cachedData &&
-			(!cachedTime || (cachedTime && Date.now() - parseInt(cachedTime) < expirationTimeInHours * 36000000))
-		) {
-			console.log(`Key "${key}" fetched from cache in ${Math.round(performance.now() - start)}ms`);
-			return JSON.parse(cachedData);
-		} else {
-			const timeoutPromise = new Promise((_, reject) => {
-				setTimeout(() => {
-					reject(new Error('Execution exceeded the 10-second limit'));
-				}, 10000);
-			});
+            if (isValid) {
+                console.log(`Key "${key}" fetched from LocalStorage in ${Math.round(performance.now() - start)}ms`);
+                return JSON.parse(cachedData);
+            }
 
-			const fetchedDataPromise = fetchFunction();
-			let fetchedData;
+            localStorage.removeItem(key);
+        }
 
-			try {
-				fetchedData = await Promise.race([fetchedDataPromise, timeoutPromise]);
-			} catch (timeoutError) {
-				throw timeoutError;
-			}
+        const cachedEntry = await idbGet(key).catch(() => null);
+        if (cachedEntry) {
+            if (Date.now() - cachedEntry.timestamp < expirationTime) {
+                console.log(`Key "${key}" fetched from IndexedDB in ${Math.round(performance.now() - start)}ms`);
+                return cachedEntry.data;
+            }
 
-			localStorage.setItem(key, JSON.stringify(fetchedData));
-			if (key.includes(':')) setCookie(`${key}_timestamp`, Date.now(), expirationTimeInHours);
+            await idbDelete(key);
+        }
 
-			console.log(`Key "${key}" fetched in ${Math.round(performance.now() - start)}ms`);
-			return fetchedData;
-		}
-	} catch (e) {
-		console.error(`Key "${key}" fetch failed in ${Math.round(performance.now() - start)}ms - ${e}`);
-		return fallback ?? [];
-	}
+        let timeoutId;
+
+        const timeoutPromise = new Promise((_, reject) => {
+            timeoutId = setTimeout(() => {
+                reject(new Error('Execution exceeded the 10-second limit'));
+            }, 10000);
+        });
+
+        let fetchedData;
+
+        try {
+            fetchedData = await Promise.race([
+                fetchFunction(),
+                timeoutPromise
+            ]);
+        } finally {
+            clearTimeout(timeoutId);
+        }
+
+        const serializedData = JSON.stringify(fetchedData);
+        const timestamp = Date.now();
+
+        try {
+            localStorage.setItem(key, serializedData);
+
+            if (key.includes(':')) {
+                setCookie(`${key}_timestamp`, timestamp, expirationTimeInHours);
+            }
+
+            console.log(`${key} Saved to LocalStorage`);
+        } catch (error) {
+            if (error.name !== 'QuotaExceededError') throw error;
+
+            await idbSet(key, fetchedData, timestamp);
+            console.warn(`${key} LocalStorage full, saved to IndexedDB`);
+        }
+
+        console.log(`Key "${key}" fetched in ${Math.round(performance.now() - start)}ms`);
+        return fetchedData;
+    } catch (error) {
+        console.error(`Key "${key}" fetch failed in ${Math.round(performance.now() - start)}ms - ${error}`);
+        return fallback ?? [];
+    }
 }
 
 function getVisualizerWidth() {
@@ -1454,14 +1579,31 @@ window.maxWidthVisualizer = function () {
 	}
 };
 
-window.clearStorage = function (reload) {
-	for (const key in localStorage) {
-		if (localStorage.hasOwnProperty(key)) {
-			localStorage.removeItem(key);
-		}
-	}
-	setCookie('userName', '', -1);
-	if (reload) location.reload();
+window.clearStorage = async function (reload) {
+    try {
+        localStorage.clear();
+
+        const db = await getCacheDB();
+
+        await new Promise((resolve, reject) => {
+            const transaction = db.transaction(storeName, 'readwrite');
+
+            transaction.objectStore(storeName).clear();
+
+            transaction.oncomplete = resolve;
+            transaction.onerror = () => reject(transaction.error);
+            transaction.onabort = () => reject(transaction.error);
+        });
+
+        db.close();
+        dbPromise = null;
+
+        setCookie('userName', '', -1);
+
+        if (reload) location.reload();
+    } catch (error) {
+        console.error('Storage cleanup failed:', error);
+    }
 };
 
 window.setCookie = function (name, value, hours) {
@@ -1994,7 +2136,7 @@ window.onload = async function () {
 	if (!lastChange || Date.now() - lastChange > 86400000) {
 		console.log('Updating data after 24h...');
 		setCookie('lastChange', Date.now(), 48);
-		clearStorage();
+		await clearStorage();
 	}
 
 	fetchData();
